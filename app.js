@@ -65,6 +65,44 @@ function slotParts(slot) { const split = String(slot).indexOf(" "); return { dat
 function dateLabel(date) { return SLOT_LABELS[state.lang][date] || date; }
 function orderLabel(order) { return order === "POLYU_FIRST" ? tr("polyuFirst") : tr("tmhFirst"); }
 function incentiveText(order) { return order === "POLYU_FIRST" ? tr("incentiveTmh") : tr("incentivePolyu"); }
+function requiredOrderForSlot(slot) {
+  const text = String(slot || "").trim();
+
+  if (!text.startsWith("2026-10-10 ")) {
+    return "";
+  }
+
+  const match =
+    text.match(/ (\d{2}):(\d{2})/);
+
+  if (!match) {
+    return "";
+  }
+
+  const startMinutes =
+    Number(match[1]) * 60 +
+    Number(match[2]);
+
+  if (startMinutes <= 12 * 60) {
+    return "POLYU_FIRST";
+  }
+
+  if (startMinutes >= 16 * 60 + 30) {
+    return "TMH_FIRST";
+  }
+
+  return "";
+}
+
+function slotAllowedForOrder(slot, order) {
+  const required =
+    requiredOrderForSlot(slot);
+
+  return (
+    !required ||
+    required === order
+  );
+}
 function setProgress(number) { document.querySelector("#progress").textContent = number ? `${tr("step")} ${number} / 7` : ""; }
 function translatePage() { document.documentElement.lang = state.lang === "zh" ? "zh-Hant" : "en"; document.querySelectorAll("[data-text]").forEach(el => el.textContent = tr(el.dataset.text)); document.querySelector("#language").textContent = state.lang === "zh" ? "English" : "中文"; }
 
@@ -111,13 +149,162 @@ function renderOrder() {
 }
 
 function renderSlots(message = "") {
-  state.step = "slots"; setProgress(5); const groups = state.slots.reduce((all, slot) => ((all[slot.slice(0, 10)] ||= []).push(slot), all), {});
+  state.step = "slots";
+  setProgress(5);
+
+  // Global available slots returned by backend,
+  // filtered again according to the selected scan order.
+  const visibleSlots =
+    state.slots.filter(
+      slot =>
+        slotAllowedForOrder(
+          slot,
+          state.order
+        )
+    );
+
+  // Truly no PolyU slots left at all.
   if (!state.slots.length) {
-    app.innerHTML = `<h2>${tr("noSlots")}</h2>${message ? `<p class="success">${tr("waitlisted")}</p>` : `<button id="waitlist">${tr("waitlist")}</button>`}<div class="actions"><button class="secondary" id="back">${tr("back")}</button></div>`; document.querySelector("#waitlist")?.addEventListener("click", joinWaitlist); document.querySelector("#back").addEventListener("click", renderOrder); return;
+    app.innerHTML =
+      `<h2>${tr("noSlots")}</h2>` +
+      (
+        message
+          ? `<p class="success">${tr("waitlisted")}</p>`
+          : `<button id="waitlist">${tr("waitlist")}</button>`
+      ) +
+      `<div class="actions">
+        <button class="secondary" id="back">${tr("back")}</button>
+      </div>`;
+
+    document
+      .querySelector("#waitlist")
+      ?.addEventListener(
+        "click",
+        joinWaitlist
+      );
+
+    document
+      .querySelector("#back")
+      .addEventListener(
+        "click",
+        renderOrder
+      );
+
+    return;
   }
-  app.innerHTML = `<h2>${tr("chooseSlot")}</h2>${message ? `<p class="error">${message}</p>` : ""}<div id="slots"></div><div class="actions"><button class="secondary" id="back">${tr("back")}</button></div>`; const container = document.querySelector("#slots");
-  Object.entries(groups).forEach(([date, slots]) => container.insertAdjacentHTML("beforeend", `<div class="date-group"><h3>${dateLabel(date)}</h3><div class="slot-grid">${slots.map(slot => `<button class="choice" type="button" data-slot="${slot}">${esc(slotParts(slot).time)}</button>`).join("")}</div></div>`));
-  container.addEventListener("click", event => { if (event.target.dataset.slot) { state.slot = event.target.dataset.slot; renderReview(); } }); document.querySelector("#back").addEventListener("click", renderOrder);
+
+  // Slots still exist, but none are compatible
+  // with the order the participant selected.
+  if (!visibleSlots.length) {
+    const explanation =
+      state.lang === "zh"
+        ? "目前剩餘時段不適合你所選的掃描次序。由於 10 月 10 日屯門醫院只於 09:00–19:00 提供掃描，請返回並選擇另一個掃描次序。"
+        : "The remaining times are not compatible with the scan order you selected. On 10 October, Tuen Mun Hospital is available only from 09:00–19:00. Please go back and choose the other scan order.";
+
+    app.innerHTML =
+      `<h2>${tr("chooseSlot")}</h2>
+       <p class="important">${explanation}</p>
+       <div class="actions">
+         <button class="secondary" id="back">${tr("back")}</button>
+       </div>`;
+
+    document
+      .querySelector("#back")
+      .addEventListener(
+        "click",
+        renderOrder
+      );
+
+    return;
+  }
+
+  const groups =
+    visibleSlots.reduce(
+      (all, slot) => (
+        (
+          all[
+            slot.slice(0, 10)
+          ] ||= []
+        ).push(slot),
+        all
+      ),
+      {}
+    );
+
+  const specialNote =
+    visibleSlots.some(
+      slot =>
+        slot.startsWith(
+          "2026-10-10 "
+        )
+    )
+      ? (
+          state.lang === "zh"
+            ? `<p class="muted">10 月 10 日部分時段因屯門醫院 09:00–19:00 的服務時間限制，只會在適合的掃描次序下顯示。</p>`
+            : `<p class="muted">Some 10 October times are shown only for a suitable scan order because Tuen Mun Hospital operates from 09:00–19:00 that day.</p>`
+        )
+      : "";
+
+  app.innerHTML =
+    `<h2>${tr("chooseSlot")}</h2>` +
+    specialNote +
+    (
+      message
+        ? `<p class="error">${message}</p>`
+        : ""
+    ) +
+    `<div id="slots"></div>
+     <div class="actions">
+       <button class="secondary" id="back">${tr("back")}</button>
+     </div>`;
+
+  const container =
+    document.querySelector(
+      "#slots"
+    );
+
+  Object
+    .entries(groups)
+    .forEach(
+      ([date, slots]) =>
+        container.insertAdjacentHTML(
+          "beforeend",
+          `<div class="date-group">
+            <h3>${dateLabel(date)}</h3>
+            <div class="slot-grid">
+              ${
+                slots
+                  .map(
+                    slot =>
+                      `<button class="choice" type="button" data-slot="${slot}">${esc(slotParts(slot).time)}</button>`
+                  )
+                  .join("")
+              }
+            </div>
+          </div>`
+        )
+    );
+
+  container.addEventListener(
+    "click",
+    event => {
+      if (
+        event.target.dataset.slot
+      ) {
+        state.slot =
+          event.target.dataset.slot;
+
+        renderReview();
+      }
+    }
+  );
+
+  document
+    .querySelector("#back")
+    .addEventListener(
+      "click",
+      renderOrder
+    );
 }
 
 async function joinWaitlist(event) {
@@ -126,8 +313,57 @@ async function joinWaitlist(event) {
 }
 
 function suggestedHospitalTime(slot, order) {
-  const start = slotParts(slot).time.split("–")[0].split(":").map(Number); let minutes = start[0] * 60 + start[1] + (order === "POLYU_FIRST" ? 120 : -120); if (order === "TMH_FIRST") minutes = Math.max(minutes, 450);
-  const format = value => `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`; return `${format(minutes)}–${format(minutes + 30)}`;
+  const { date, time } =
+    slotParts(slot);
+
+  const start =
+    time
+      .split("–")[0]
+      .split(":")
+      .map(Number);
+
+  const polyuMinutes =
+    start[0] * 60 +
+    start[1];
+
+  let minutes;
+
+  if (order === "POLYU_FIRST") {
+
+    minutes =
+      polyuMinutes + 120;
+
+  } else if (
+    date === "2026-10-10"
+  ) {
+
+    minutes =
+      Math.max(
+        polyuMinutes - 210,
+        9 * 60
+      );
+
+  } else {
+
+    minutes =
+      Math.max(
+        polyuMinutes - 120,
+        450
+      );
+  }
+
+  const format =
+    value =>
+      `${String(
+        Math.floor(value / 60)
+      ).padStart(2, "0")}:${String(
+        value % 60
+      ).padStart(2, "0")}`;
+
+  return (
+    `${format(minutes)}–` +
+    `${format(minutes + 30)}`
+  );
 }
 
 function renderReview() {
