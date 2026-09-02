@@ -76,7 +76,7 @@ const NOTICES = {
     "掃描前 3 天請盡量避免不必要的藥物使用。如因醫療需要必須服藥，請按醫生指示正常服用，<strong>不要自行停藥</strong>，並告知研究團隊藥物名稱及劑量。",
     "屯門醫院<strong>無需另外預約固定時間</strong>。系統會根據你選擇的香港理工大學掃描時段及掃描次序，提供當天屯門醫院的建議到達時間。請按確認頁顯示的時間安排行程。",
     "香港理工大學與屯門醫院之間請預留約 <strong>1–1.5 小時</strong>公共交通時間。",
-    "<strong>請準時或提前抵達，但勿早於預約時間超過 15 分鐘</strong>到達香港理工大學。過早到達可能需要較長時間等候。",
+    "<strong>請勿早於預約時間超過 15 分鐘</strong>到達香港理工大學。過早到達可能需要較長時間等候。",
     "如不能出席或需要更改時間，請盡早處理。距離預約不足 24 小時時，請直接聯絡研究團隊。",
     `完成同一天兩個地點的掃描後，你將獲得 <strong>HK$${INCENTIVE_AMOUNT}</strong> 的研究參與津貼。津貼只會發放一次，並由你當天最後完成掃描的地點發放。`
   ],
@@ -122,7 +122,7 @@ const T = {
 
     chooseOrder: "你希望先去哪一個掃描地點？",
     sameDay: "你需要在同一天完成香港理工大學及屯門醫院兩次掃描。",
-    scheduleRule: "香港理工大學需要預約指定時間。",
+    scheduleRule: "香港理工大學需要預約指定時間。不同時段會配合兩地行程安排指定掃描先後次序。",
     travelRule: "屯門醫院無需另外預約固定時段。系統會提供建議到達時間，兩地之間請預留約 1–1.5 小時公共交通時間。",
 
     polyuFirst: "香港理工大學 → 屯門醫院",
@@ -555,7 +555,7 @@ function renderSlots(message = "") {
   });
 
   const note = state.lang === "zh"
-    ? "以下是你所選掃描次序的可預約時間。"
+    ? "為配合屯門醫院服務時間及兩地交通，以下只顯示適合你所選掃描次序的可預約時間。"
     : "To allow for hospital operating hours and travel, only PolyU times compatible with your selected scan order are shown.";
 
   app.innerHTML = `
