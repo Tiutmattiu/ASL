@@ -1,3 +1,5 @@
+const INCENTIVE_AMOUNT = 200;
+
 const FILES = {
   info: "assets/participant-information-sheet.pdf",
   consent: "assets/consent-form.pdf",
@@ -5,350 +7,515 @@ const FILES = {
   tmhGuide: "assets/polyu-to-tmh.pdf"
 };
 
-const SLOTS = [
-  { id:"A", polyu:"12:30–13:00", tmh:"10:30–11:00", order:"TMH_FIRST" },
-  { id:"B", polyu:"13:00–13:30", tmh:"15:00–15:30", order:"POLYU_FIRST" },
-  { id:"C", polyu:"16:00–16:30", tmh:"13:00–13:30", order:"TMH_FIRST" },
-  { id:"D", polyu:"16:30–17:00", tmh:"13:30–14:00", order:"TMH_FIRST" },
-  { id:"E", polyu:"17:00–17:30", tmh:"14:00–14:30", order:"TMH_FIRST" },
-  { id:"F", polyu:"17:30–18:00", tmh:"14:30–15:00", order:"TMH_FIRST" },
-  { id:"G", polyu:"18:00–18:30", tmh:"15:30–16:00", order:"TMH_FIRST" }
-];
-
-const T = {
-  zh: {
-    pageTitle:"研究掃描候補登記",
-    footer:"不同場強下動脈自旋標記成像一致性研究",
-    introTitle:"研究簡介",
-    intro:[
-      "本研究比較 1.5T 與 3.0T 磁力共振（MRI）下動脈自旋標記（ASL）腦血流成像結果的一致性。",
-      "MRI 使用磁場及無線電波成像，不使用 X 光或其他電離輻射。",
-      "每位參加者需要完成兩次 MRI 掃描，地點分別為香港理工大學及屯門醫院。"
-    ],
-    standbyTitle:"10 月 4 日臨時候補",
-    standbyText:"目前有數個 10 月 4 日時段可能臨時釋出。這是候補登記，不是正式預約。只有收到研究團隊以電話或 WhatsApp 明確確認兩個掃描時間，才代表預約成功；未收到確認請不要自行前往。",
-    eligibilityTitle:"參與資格",
-    eligibility:[
-      "年齡 18–40 歲。",
-      "沒有精神疾病或神經系統疾病病史。",
-      "沒有 MRI 禁忌，例如心臟起搏器、不能移除的金屬植入物／裝置，或嚴重幽閉恐懼。",
-      "如適用，現時並非懷孕或備孕。",
-      "可以在同一天完成香港理工大學及屯門醫院兩次掃描。"
-    ],
-    procedureTitle:"掃描安排與準備",
-    notices:[
-      "兩次掃描需要在同一天完成。",
-      "兩個地點的掃描時間都是固定時間；正式確認後，請按照研究團隊提供的時間出席。",
-      "香港理工大學及屯門醫院均建議在掃描時間前約 30 分鐘到達。",
-      "兩地之間請預留約 1–1.5 小時公共交通時間。",
-      "掃描前至少 2 小時不要進食。",
-      "掃描當天不要吸煙、飲酒、飲用咖啡、茶、能量飲品或其他含咖啡因產品。",
-      "掃描前一晚不要熬夜，並保持充足睡眠。",
-      "掃描前避免劇烈運動及強烈情緒激動。",
-      "掃描前 3 天請盡量避免不必要的藥物；如因醫療需要必須服藥，請按醫生指示正常服用，不要自行停藥，並告知研究團隊藥物名稱及劑量。",
-      "如不能出席或需要更改時間，請直接聯絡研究團隊，不要自行更改。",
-      "完成兩次掃描後可獲 HK$200 研究參與津貼，津貼只發放一次。"
-    ],
-    routeTitle:"到達及路線",
-    routeContact:"到達後請直接致電或 WhatsApp 91230084 聯絡研究團隊。",
-    polyuRoute:"前往香港理工大學 UBSN / ZB217",
-    polyuNote:"ZB217 位於 LG2，手機訊號可能較弱；建議乘升降機到 LG2 前先聯絡我們。",
-    tmhRoute:"香港理工大學 → 屯門醫院",
-    tmhNote:"到達屯門醫院後，請到主座地下放射科（X光部門）門口等候，工作人員會前往接你。",
-    docsTitle:"研究文件及同意書",
-    docsText:"請先閱讀完整《參加者須知》。其中包括研究目的、流程、風險、保密安排，以及 MRI 中可能出現意外發現的處理方式。",
-    infoBtn:"閱讀 / 下載參加者須知",
-    consentText:"同意書亦可先下載閱讀。正式參加前，需要在意外發現部分選擇「希望得到通知」或「不希望得到通知」，並填寫姓名、簽署及日期；完成後可把清晰照片或 PDF WhatsApp 至 91230084。",
-    consentBtn:"閱讀 / 下載同意書",
-    readAck:"我已閱讀參加者須知，並明白上述候補及掃描安排",
-    formTitle:"候補資料",
-    formHelp:"請填寫以下資料，並勾選你可以出席的所有安排。選得越多，越容易安排到臨時空缺。",
-    name:"姓名",
-    phone:"電話",
-    age:"年齡",
-    gender:"性別",
-    female:"女",
-    male:"男",
-    other:"其他",
-    height:"身高（cm）",
-    weight:"體重（kg）",
-    handedness:"慣用手",
-    right:"右手",
-    left:"左手",
-    choose:"請選擇",
-    scheduleTitle:"可出席的 10 月 4 日安排",
-    polyu:"香港理工大學",
-    tmh:"屯門醫院",
-    scanTime:"掃描",
-    arrive:"建議到達",
-    order:"次序",
-    tFirst:"屯門醫院 → 香港理工大學",
-    pFirst:"香港理工大學 → 屯門醫院",
-    eligibilityAck:"我確認上述參與資格適用於我，並會在研究團隊正式確認後才前往。",
-    submit:"提交候補登記",
-    submitting:"提交中…",
-    needSlot:"請至少選擇一個可以出席的安排。",
-    needRead:"請先閱讀參加者須知並勾選確認。",
-    successTitle:"候補登記已收到",
-    success1:"謝謝。這不是正式預約確認。",
-    success2:"如有適合的空缺，研究團隊會以電話或 WhatsApp 聯絡你，並明確確認兩個固定掃描時間。若未收到確認，請不要自行前往。",
-    already:"這個電話已經存在於研究名單中。如需更改安排，請直接 WhatsApp 91230084。",
-    error:"暫時無法提交，請直接 WhatsApp 91230084。",
-    open:"查看 PDF"
+const PLAN = {
+  B: {
+    polyu:"2026-10-04 13:00–13:30",
+    tmh:"2026-10-04 15:00–15:30",
+    order:"POLYU_FIRST",
+    qr:"https://drive.google.com/thumbnail?id=1Lid_keX_jGDryzDUmKMq2fw080LTRPzP&sz=w1000"
   },
-  en: {
-    pageTitle:"Study Scan Standby Registration",
-    footer:"Consistency of arterial spin labelling imaging across field strengths",
-    introTitle:"About the study",
-    intro:[
-      "This study compares the consistency of arterial spin labelling (ASL) brain-perfusion MRI measurements at 1.5T and 3.0T.",
-      "MRI uses magnetic fields and radio waves and does not use X-rays or other ionising radiation.",
-      "Each participant completes two MRI scans, one at The Hong Kong Polytechnic University and one at Tuen Mun Hospital."
-    ],
-    standbyTitle:"4 October standby registration",
-    standbyText:"Several 4 October appointments may become available at short notice. This is standby registration, not a confirmed booking. Your appointment is confirmed only after the study team explicitly confirms both scan times by phone or WhatsApp. Do not travel to either site without confirmation.",
-    eligibilityTitle:"Eligibility",
-    eligibility:[
-      "Age 18–40 years.",
-      "No history of psychiatric or neurological disease.",
-      "No MRI contraindication such as a cardiac pacemaker, non-removable metallic implant/device, or severe claustrophobia.",
-      "If applicable, not currently pregnant or planning pregnancy.",
-      "Able to complete both PolyU and Tuen Mun Hospital scans on the same day."
-    ],
-    procedureTitle:"Scan arrangements and preparation",
-    notices:[
-      "Both scans must be completed on the same day.",
-      "Both sites now use fixed scan times; after confirmation, attend at the times given by the study team.",
-      "Please arrive about 30 minutes before the scan time at both PolyU and Tuen Mun Hospital.",
-      "Allow approximately 1–1.5 hours for public transport between the two sites.",
-      "Do not eat for at least 2 hours before scanning.",
-      "On the scan day, do not smoke, drink alcohol, coffee, tea, energy drinks, or other caffeinated products.",
-      "Do not stay up late the night before; get sufficient sleep.",
-      "Avoid strenuous exercise and strong emotional excitement before scanning.",
-      "Avoid unnecessary medication for 3 days where possible. If medication is medically necessary, take it as directed; do not stop prescribed medication on your own, and tell the team the name and dose.",
-      "If you cannot attend or need to change a time, contact the study team directly; do not change it yourself.",
-      "After completing both scans, you will receive one HK$200 study participation incentive."
-    ],
-    routeTitle:"Arrival and directions",
-    routeContact:"When you arrive, call or WhatsApp 91230084.",
-    polyuRoute:"Getting to PolyU UBSN / ZB217",
-    polyuNote:"ZB217 is on LG2 and mobile signal may be weak. Contact us before taking the lift down to LG2.",
-    tmhRoute:"PolyU → Tuen Mun Hospital",
-    tmhNote:"At Tuen Mun Hospital, wait outside the Radiology (X-ray) Department on the ground floor of the Main Block. A staff member will meet you there.",
-    docsTitle:"Study documents and consent",
-    docsText:"Please read the full Participant Information Sheet first. It covers the study purpose, procedures, risks, confidentiality, and arrangements for possible incidental MRI findings.",
-    infoBtn:"Read / download information sheet",
-    consentText:"You may also review the consent form now. Before taking part, choose whether you wish to be notified about incidental findings, then enter your name, sign and date the form. A clear photo or PDF may be sent to 91230084 by WhatsApp.",
-    consentBtn:"Read / download consent form",
-    readAck:"I have read the Participant Information Sheet and understand the standby and scan arrangements above",
-    formTitle:"Standby details",
-    formHelp:"Complete the details below and select every schedule you could attend. Choosing more options makes it easier to match you to a late vacancy.",
-    name:"Name",
-    phone:"Phone",
-    age:"Age",
-    gender:"Gender",
-    female:"Female",
-    male:"Male",
-    other:"Other",
-    height:"Height (cm)",
-    weight:"Weight (kg)",
-    handedness:"Handedness",
-    right:"Right",
-    left:"Left",
-    choose:"Choose",
-    scheduleTitle:"4 October schedules you can attend",
-    polyu:"PolyU",
-    tmh:"Tuen Mun Hospital",
-    scanTime:"scan",
-    arrive:"recommended arrival",
-    order:"Order",
-    tFirst:"Tuen Mun Hospital → PolyU",
-    pFirst:"PolyU → Tuen Mun Hospital",
-    eligibilityAck:"I confirm that the eligibility statements above apply to me and I will only attend after the study team formally confirms my booking.",
-    submit:"Submit standby registration",
-    submitting:"Submitting…",
-    needSlot:"Select at least one schedule you could attend.",
-    needRead:"Please read the Participant Information Sheet and tick the acknowledgement first.",
-    successTitle:"Standby registration received",
-    success1:"Thank you. This is not a confirmed appointment.",
-    success2:"If a suitable vacancy becomes available, the study team will contact you by phone or WhatsApp and explicitly confirm both fixed scan times. Do not attend unless you receive that confirmation.",
-    already:"This phone number is already on the study list. Please WhatsApp 91230084 if you need to change an arrangement.",
-    error:"Unable to submit right now. Please WhatsApp 91230084.",
-    open:"View PDF"
+  D: {
+    polyu:"2026-10-04 16:30–17:00",
+    tmh:"2026-10-04 13:30–14:00",
+    order:"TMH_FIRST",
+    qr:"https://drive.google.com/thumbnail?id=1PnPcDVYIQP_XFe8enpLHE9VVUjXLoZOX&sz=w1000"
   }
 };
 
-let lang="zh";
-const app=document.querySelector("#app");
-const tr=k=>T[lang][k];
+const NOTICES = {
+  zh: [
+    `請先閱讀完整的<strong>《參加者須知》</strong>.然後閱讀同意書。<br><br><strong>MRI 意外發現是什麼？</strong><br>MRI 意外發現是指研究掃描中偶然發現可能需要進一步醫療評估的異常，例如疑似<strong>腦出血、中風、腫瘤</strong>或其他明顯異常。研究 MRI 並不是正式的臨床診斷檢查，也不會提供常規影像報告。<br><br>如果你在同意書中勾選<strong>「希望得到通知」</strong>：若研究人員在影像中發現上述可能具有臨床意義的異常，我們會在發現後聯絡你。<br><br>如果你勾選<strong>「不希望得到通知」</strong>：即使研究影像中發現可能的異常，我們也不會因本研究的影像結果主動通知你。<br><br>如果之後正式確認參加，請在同意書中選擇其中一項，並填寫姓名、簽署及日期。<div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">參加者須知</a><a class="button-link secondary-link" href="${FILES.consent}" target="_blank" rel="noopener">同意書</a></div>`,
+    "你需要在<strong>同一天</strong>完成香港理工大學及屯門醫院兩次 MRI 掃描。",
+    "香港理工大學及屯門醫院的<strong>掃描時間均為固定時間</strong>；請從目前提供的固定配對安排中選擇一個。",
+    "兩個地點都建議在<strong>掃描時間前約 30 分鐘到達</strong>。",
+    "掃描前請保持<strong>至少 2 小時未進食</strong>。",
+    "掃描當天<strong>請勿吸煙、飲酒、飲用咖啡或茶</strong>，並避免能量飲品及其他含咖啡因產品。",
+    "掃描前一晚<strong>請勿熬夜</strong>，並保持充足睡眠。",
+    "掃描前請避免劇烈運動及強烈情緒激動，保持正常休息。",
+    "掃描前 3 天請盡量避免不必要的藥物。如因醫療需要必須服藥，請按醫生指示正常服用，<strong>不要自行停藥</strong>，並告知研究團隊藥物名稱及劑量。",
+    "香港理工大學與屯門醫院之間請預留約 <strong>1–1.5 小時</strong>公共交通時間。",
+    "到達香港理工大學或屯門醫院後，請直接<strong>致電或 WhatsApp 91230084</strong>。屯門醫院請在主座地下放射科（X光部門）門口等候工作人員。",
+    `完成兩次掃描後可獲 <strong>HK$${INCENTIVE_AMOUNT}</strong> 研究參與津貼；津貼只發放一次。`
+  ],
+  en: [
+    `Please first read the full <strong>Participant Information Sheet</strong>. You may also review the consent form now.<br><br><strong>What is an incidental MRI finding?</strong><br>This means an unexpected abnormality noticed during the research scan that may require further medical assessment, for example a suspected <strong>brain haemorrhage, stroke, tumour</strong>, or another obvious abnormality. A research MRI is not a formal clinical diagnostic examination and does not provide a routine radiology report.<br><br>If you select <strong>“I wish to be notified”</strong>: if the researchers identify a potentially clinically significant abnormality, we will contact you after it is found.<br><br>If you select <strong>“I do not wish to be notified”</strong>: even if a possible abnormality is seen on the research images, we will not proactively notify you on the basis of the research images.<br><br>If you are later formally confirmed, please choose one option on the consent form, then enter your name, sign and date it.<div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">Information sheet</a><a class="button-link secondary-link" href="${FILES.consent}" target="_blank" rel="noopener">Consent form</a></div>`,
+    "You must complete both MRI scans at <strong>PolyU and Tuen Mun Hospital on the same day</strong>.",
+    "The scan times at <strong>both locations are fixed</strong>. Please choose one of the available paired arrangements.",
+    "Please arrive about <strong>30 minutes before the scan time at both locations</strong>.",
+    "Please <strong>do not eat for at least 2 hours</strong> before scanning.",
+    "On the scan day, <strong>do not smoke, drink alcohol, coffee or tea</strong>, and avoid energy drinks and other caffeinated products.",
+    "Please <strong>do not stay up late</strong> the night before and get sufficient sleep.",
+    "Avoid strenuous exercise and strong emotional excitement before scanning.",
+    "Avoid unnecessary medication for 3 days where possible. If medication is medically necessary, take it as directed and <strong>do not stop prescribed medication on your own</strong>. Tell the study team the name and dose.",
+    "Allow approximately <strong>1–1.5 hours</strong> for public transport between PolyU and Tuen Mun Hospital.",
+    "On arrival at either site, <strong>call or WhatsApp 91230084</strong>. At Tuen Mun Hospital, wait outside Radiology (X-ray) on the ground floor of the Main Block.",
+    `After completing both scans, you will receive one <strong>HK$${INCENTIVE_AMOUNT}</strong> study participation incentive.`
+  ]
+};
 
-function esc(v=""){const x=document.createElement("span");x.textContent=v==null?"":String(v);return x.innerHTML;}
-function start(time){const m=String(time).match(/(\d{1,2}):(\d{2})/);return m?Number(m[1])*60+Number(m[2]):null;}
-function arrive(time){const m=start(time);if(m==null)return"";const x=(m-30+1440)%1440;return String(Math.floor(x/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0");}
-function orderLabel(o){return o==="TMH_FIRST"?tr("tFirst"):tr("pFirst");}
+const T = {
+  zh: {
+    title:"研究掃描候補",
+    footer:"不同場強下動脈自旋標記成像一致性研究",
+    step:"步驟",
+    phoneTitle:"輸入聯絡電話",
+    phoneHelp:"請使用你在研究登記時提供的電話號碼。系統會直接讀取你已登記的資料，不需要重新填寫姓名、年齡或性別。",
+    phone:"電話號碼",
+    continue:"繼續",
+    back:"返回",
+    finding:"正在查找…",
+    notFound:"找不到這個電話號碼，請確認已完成第一階段研究登記，或直接聯絡 91230084。",
+    genericError:"暫時無法連接系統，請稍後再試。",
+    alreadyBooked:"你已經有正式掃描預約。請返回參加者頁面查看現有安排。",
+    openPortal:"查看我的正式預約",
+    participant:"參加者",
+    notices:"請逐項閱讀",
+    understand:"我知道了",
+    understood:"已明白 ✓",
+    chooseSlot:"選擇一個掃描安排",
+    slotHelp:"以下兩個安排均為固定配對；請選擇其中一個。",
+    polyuFirst:"理工 → 屯門",
+    tmhFirst:"屯門 → 理工",
+    waitlistTitle:"已加入候補名單",
+    waitlistBody:"你選擇的安排已被另一位參加者先選取。你的資料已加入候補名單；如該安排再次有空缺，研究團隊會聯絡你。請勿自行前往。",
+    selected:"已選擇",
+    submit:"提交候補",
+    submitting:"正在提交…",
+    needSlot:"請先選擇一個時間。",
+    candidateTitle:"候補安排已提交",
+    candidateWarning:"這仍然是候補，並不是正式預約。只有收到研究團隊以電話或 WhatsApp 明確確認後，才代表你獲得這個時段；未收到確認請不要自行前往。",
+    order:"次序",
+    polyu:"香港理工大學 UBSN",
+    tmh:"屯門醫院",
+    fixedScan:"固定掃描時間",
+    arrival:"建議到達",
+    preparation:"掃描前準備",
+    travel:"兩地公共交通請預留約 1–1.5 小時。",
+    contact:"到達後請電話或 WhatsApp 91230084 聯絡研究團隊。",
+    polyuSignal:"ZB217 位於 LG2，手機訊號可能較弱；建議乘升降機到 LG2 前先聯絡我們。",
+    tmhMeet:"到達屯門醫院後，請到主座地下放射科（X光部門）門口等候，工作人員會前往接你。",
+    incentive:"研究參與津貼",
+    incentiveText:"正式確認並完成兩次掃描後可獲 HK$200，津貼只發放一次。",
+    docs:"研究文件",
+    qr:"PolyU 校園入場二維碼",
+    qrSave:"查看／儲存入場二維碼",
+    routes:"路線指引",
+    polyuRoute:"前往 PolyU UBSN / ZB217",
+    tmhRoute:"PolyU → 屯門醫院",
+    alreadyRegistered:"這個電話已有候補／研究記錄，如需更改請直接 WhatsApp 91230084。"
+  },
+  en: {
+    title:"Study Scan Standby",
+    footer:"Consistency of arterial spin labelling imaging across field strengths",
+    step:"Step",
+    phoneTitle:"Enter your contact number",
+    phoneHelp:"Use the phone number provided during study registration. Your existing details will be loaded automatically; you do not need to re-enter your name, age or sex.",
+    phone:"Phone number",
+    continue:"Continue",
+    back:"Back",
+    finding:"Looking up…",
+    notFound:"We could not find that phone number. Please make sure you completed the first-stage study registration, or contact 91230084.",
+    genericError:"The service is temporarily unavailable. Please try again later.",
+    alreadyBooked:"You already have a confirmed scan booking. Please return to the participant portal to view it.",
+    openPortal:"View my confirmed booking",
+    participant:"Participant",
+    notices:"Please read each item",
+    understand:"I understand",
+    understood:"Understood ✓",
+    chooseSlot:"Choose one scan arrangement",
+    slotHelp:"Both options are fixed paired arrangements. Please choose one.",
+    polyuFirst:"PolyU → Tuen Mun Hospital",
+    tmhFirst:"Tuen Mun Hospital → PolyU",
+    waitlistTitle:"Added to the waitlist",
+    waitlistBody:"Another participant selected this arrangement first. You have been added to the waitlist; the study team will contact you if the arrangement becomes available again. Please do not attend unless contacted.",
+    selected:"Selected",
+    submit:"Submit standby",
+    submitting:"Submitting…",
+    needSlot:"Please choose a time first.",
+    candidateTitle:"Standby arrangement submitted",
+    candidateWarning:"This is still standby and is not a confirmed appointment. You have the slot only after the study team explicitly confirms it by phone or WhatsApp. Do not attend unless you receive confirmation.",
+    order:"Order",
+    polyu:"PolyU UBSN",
+    tmh:"Tuen Mun Hospital",
+    fixedScan:"Fixed scan time",
+    arrival:"Recommended arrival",
+    preparation:"Before your scans",
+    travel:"Allow approximately 1–1.5 hours for public transport between the two sites.",
+    contact:"On arrival, call or WhatsApp 91230084.",
+    polyuSignal:"ZB217 is on LG2 and mobile signal may be weak. Contact us before taking the lift down to LG2.",
+    tmhMeet:"At Tuen Mun Hospital, wait outside Radiology (X-ray) on the ground floor of the Main Block. A staff member will meet you there.",
+    incentive:"Study participation incentive",
+    incentiveText:"If formally confirmed, you will receive HK$200 after completing both scans. It is paid once.",
+    docs:"Study documents",
+    qr:"PolyU campus entry QR code",
+    qrSave:"View / save QR code",
+    routes:"Directions",
+    polyuRoute:"Getting to PolyU UBSN / ZB217",
+    tmhRoute:"PolyU → Tuen Mun Hospital",
+    alreadyRegistered:"This phone number already has a standby/study record. Please WhatsApp 91230084 if you need to change it."
+  }
+};
+
+const state = {
+  lang:"zh",
+  step:"phone",
+  phone:"",
+  participant:null,
+  noticesDone:0,
+  slotId:""
+};
+
+const app=document.querySelector("#app");
+const tr=k=>T[state.lang][k];
+
+function esc(value=""){
+  const el=document.createElement("span");
+  el.textContent=value==null?"":String(value);
+  return el.innerHTML;
+}
+
+function setProgress(n){
+  document.querySelector("#progress").textContent=n?`${tr("step")} ${n} / 4`:"";
+}
+
+function translatePage(){
+  document.documentElement.lang=state.lang==="zh"?"zh-Hant":"en";
+  document.querySelectorAll("[data-text]").forEach(el=>el.textContent=tr(el.dataset.text));
+  document.querySelector("#language").textContent=state.lang==="zh"?"English":"中文";
+}
+
+function slotParts(value){
+  const text=String(value||"");
+  const i=text.indexOf(" ");
+  return i<0?{date:"",time:text}:{date:text.slice(0,i),time:text.slice(i+1)};
+}
+
+function arrivalTime(value){
+  const time=slotParts(value).time;
+  const m=time.match(/(\d{1,2}):(\d{2})/);
+  if(!m)return"";
+  const total=Number(m[1])*60+Number(m[2])-30;
+  const x=(total+1440)%1440;
+  return String(Math.floor(x/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0");
+}
+
+function dateLabel(value){
+  const date=slotParts(value).date || String(value || "");
+  const map={
+    "2026-10-04": state.lang==="zh" ? "2026 年 10 月 4 日" : "4 October 2026",
+    "2026-10-10": state.lang==="zh" ? "2026 年 10 月 10 日" : "10 October 2026"
+  };
+  return map[date] || date;
+}
+
+function orderLabel(order){
+  if(state.lang==="zh") return order==="POLYU_FIRST"?"香港理工大學 → 屯門醫院":"屯門醫院 → 香港理工大學";
+  return order==="POLYU_FIRST"?"PolyU → Tuen Mun Hospital":"Tuen Mun Hospital → PolyU";
+}
+
+function preparationList(){
+  const items=state.lang==="zh"
+    ?[
+      "掃描前至少 2 小時不要進食",
+      "掃描當天不要吸煙、飲酒，或飲用咖啡、茶及其他含咖啡因產品",
+      "前一晚不要熬夜，保持充足睡眠",
+      "避免劇烈運動及強烈情緒激動",
+      "必要藥物按醫囑正常服用，不要自行停藥，並告知研究團隊藥名及劑量",
+      "兩個地點均建議提前約 30 分鐘到達"
+    ]
+    :[
+      "Do not eat for at least 2 hours before scanning",
+      "Do not smoke, drink alcohol, or consume coffee, tea or other caffeinated products on the scan day",
+      "Do not stay up late; get sufficient sleep",
+      "Avoid strenuous exercise and strong emotional excitement",
+      "Take medically necessary medication as directed; do not stop it on your own, and tell the study team the name and dose",
+      "Please arrive about 30 minutes early at both locations"
+    ];
+  return `<ul>${items.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+}
 
 async function api(payload){
-  const r=await fetch(ASL_CONFIG.WEB_APP_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
-  const j=await r.json();
-  if(!j.ok) throw Object.assign(new Error(j.message||"API error"),{code:j.code});
-  return j;
+  const response=await fetch(ASL_CONFIG.WEB_APP_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  });
+  const result=await response.json();
+  if(!result.ok) throw Object.assign(new Error(result.message||"API error"),{code:result.code});
+  return result;
 }
 
-function translateChrome(){
-  document.documentElement.lang=lang==="zh"?"zh-Hant":"en";
-  document.querySelector("#page-title").textContent=tr("pageTitle");
-  document.querySelector("#footer").textContent=tr("footer");
-  document.querySelector("#language").textContent=lang==="zh"?"English":"中文";
-}
-
-function linkCard(href,title){
-  return `<a class="file-link" href="${href}" target="_blank" rel="noopener"><strong>${title}</strong><span>${tr("open")}</span></a>`;
-}
-
-function list(items){return `<ul>${items.map(x=>`<li>${x}</li>`).join("")}</ul>`;}
-
-function slotCard(s){
-  return `
-    <label class="choice standby-choice">
-      <div class="slot-choice-head">
-        <input type="checkbox" name="slot" value="${s.id}">
-        <strong>${s.id}</strong>
-      </div>
-      <div class="slot-site"><b>${tr("tmh")}</b> — ${tr("scanTime")} ${s.tmh} · ${tr("arrive")} ${arrive(s.tmh)}</div>
-      <div class="slot-site"><b>${tr("polyu")}</b> — ${tr("scanTime")} ${s.polyu} · ${tr("arrive")} ${arrive(s.polyu)}</div>
-      <small>${tr("order")}：${orderLabel(s.order)}</small>
-    </label>`;
-}
-
-function render(){
-  translateChrome();
+function renderPhone(error=""){
+  state.step="phone";
+  setProgress(1);
   app.innerHTML=`
-    <section class="study-intro">
-      <h2>${tr("introTitle")}</h2>
-      ${list(tr("intro"))}
-    </section>
-
-    <div class="important">
-      <h3>${tr("standbyTitle")}</h3>
-      <p class="compact">${tr("standbyText")}</p>
-    </div>
-
-    <section class="panel">
-      <h3>${tr("eligibilityTitle")}</h3>
-      ${list(tr("eligibility"))}
-    </section>
-
-    <section class="panel">
-      <h3>${tr("procedureTitle")}</h3>
-      <div class="notice-list">${tr("notices").map((x,i)=>`<div class="notice done"><strong>${i+1}.</strong> ${x}</div>`).join("")}</div>
-    </section>
-
-    <section class="panel">
-      <h3>${tr("routeTitle")}</h3>
-      <p><strong>${tr("routeContact")}</strong></p>
-      <div class="link-grid">
-        ${linkCard(FILES.polyuGuide,tr("polyuRoute"))}
-        <p class="muted">${tr("polyuNote")}</p>
-        ${linkCard(FILES.tmhGuide,tr("tmhRoute"))}
-        <p class="muted compact">${tr("tmhNote")}</p>
+    <h2>${tr("phoneTitle")}</h2>
+    <p class="muted">${tr("phoneHelp")}</p>
+    ${error?`<p class="error">${esc(error)}</p>`:""}
+    <form id="phone-form">
+      <label for="phone">${tr("phone")}</label>
+      <div class="phone">
+        <select id="country">
+          <option value="+852">+852 Hong Kong</option>
+          <option value="+86">+86 Mainland China</option>
+        </select>
+        <input id="phone" type="tel" inputmode="tel" autocomplete="tel" required>
       </div>
-    </section>
-
-    <section class="panel">
-      <h3>${tr("docsTitle")}</h3>
-      <p>${tr("docsText")}</p>
-      ${linkCard(FILES.info,tr("infoBtn"))}
-      <p style="margin-top:14px">${tr("consentText")}</p>
-      ${linkCard(FILES.consent,tr("consentBtn"))}
-      <label class="check-row" style="margin-top:16px">
-        <input id="read-info" type="checkbox">
-        <span>${tr("readAck")}</span>
-      </label>
-    </section>
-
-    <form id="standby-form">
-      <section class="panel">
-        <h3>${tr("formTitle")}</h3>
-        <p class="muted">${tr("formHelp")}</p>
-        <div class="profile-grid">
-          <label>${tr("name")}<input id="name" required></label>
-          <label>${tr("phone")}<input id="phone" type="tel" inputmode="tel" required></label>
-          <label>${tr("age")}<input id="age" type="number" min="18" max="40" required></label>
-          <label>${tr("gender")}
-            <select id="gender" required>
-              <option value="">${tr("choose")}</option>
-              <option value="F">${tr("female")}</option>
-              <option value="M">${tr("male")}</option>
-              <option value="OTHER">${tr("other")}</option>
-            </select>
-          </label>
-          <label>${tr("height")}<input id="height" type="number" min="100" max="250" step="0.1" required></label>
-          <label>${tr("weight")}<input id="weight" type="number" min="20" max="300" step="0.1" required></label>
-          <label>${tr("handedness")}
-            <select id="handedness" required>
-              <option value="">${tr("choose")}</option>
-              <option value="R">${tr("right")}</option>
-              <option value="L">${tr("left")}</option>
-            </select>
-          </label>
-        </div>
-      </section>
-
-      <section class="panel">
-        <h3>${tr("scheduleTitle")}</h3>
-        <div class="slot-grid standby-grid">${SLOTS.map(slotCard).join("")}</div>
-      </section>
-
-      <label class="check-row">
-        <input id="eligible" type="checkbox" required>
-        <span>${tr("eligibilityAck")}</span>
-      </label>
-
-      <div class="actions">
-        <button id="submit" type="submit">${tr("submit")}</button>
-      </div>
-      <p id="status"></p>
+      <button type="submit">${tr("continue")}</button>
     </form>
   `;
-  document.querySelector("#standby-form").onsubmit=submit;
+  document.querySelector("#phone-form").onsubmit=lookup;
 }
 
-async function submit(e){
+async function lookup(e){
   e.preventDefault();
-  const preferences=[...document.querySelectorAll('input[name="slot"]:checked')].map(x=>x.value);
-  const readInfo=document.querySelector("#read-info").checked;
-  const status=document.querySelector("#status");
-  const btn=document.querySelector("#submit");
-
-  if(!readInfo){status.className="error";status.textContent=tr("needRead");return;}
-  if(!preferences.length){status.className="error";status.textContent=tr("needSlot");return;}
-
-  btn.disabled=true;btn.textContent=tr("submitting");status.textContent="";
+  const btn=e.currentTarget.querySelector("button");
+  btn.disabled=true;
+  btn.textContent=tr("finding");
+  state.phone=document.querySelector("#country").value+document.querySelector("#phone").value.replace(/\s+/g,"");
   try{
-    await api({
-      action:"standbySignup",
-      name:document.querySelector("#name").value.trim(),
-      phone:document.querySelector("#phone").value.trim(),
-      age:document.querySelector("#age").value,
-      gender:document.querySelector("#gender").value,
-      height:document.querySelector("#height").value,
-      weight:document.querySelector("#weight").value,
-      handedness:document.querySelector("#handedness").value,
-      preferences,
-      eligible:document.querySelector("#eligible").checked,
-      informationRead:true
-    });
-    app.innerHTML=`
-      <h2 class="success">${tr("successTitle")}</h2>
-      <p><strong>${tr("success1")}</strong></p>
-      <p>${tr("success2")}</p>
-      <div class="important">91230084 · <a href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp</a></div>
-    `;
+    const r=await api({action:"lookup",phone:state.phone});
+    state.participant=r.participant;
+    if(state.participant.appointment){
+      app.innerHTML=`
+        <h2>${esc(state.participant.name)}</h2>
+        <p class="important">${tr("alreadyBooked")}</p>
+        <a class="button-link" href="./">${tr("openPortal")}</a>
+      `;
+      setProgress(1);
+      return;
+    }
+    state.noticesDone=0;
+    renderNotices();
   }catch(err){
-    btn.disabled=false;btn.textContent=tr("submit");status.className="error";
-    status.textContent=err.code==="ALREADY_REGISTERED"?tr("already"):tr("error");
+    renderPhone(err.code==="NOT_FOUND"?tr("notFound"):tr("genericError"));
   }
 }
 
-document.querySelector("#language").onclick=()=>{lang=lang==="zh"?"en":"zh";render();};
-render();
+function renderNotices(){
+  state.step="notices";
+  setProgress(2);
+  const p=state.participant;
+  app.innerHTML=`
+    <div class="summary">
+      <div><strong>${tr("participant")}</strong><br>${esc(p.name)}</div>
+      <div><strong>${tr("phone")}</strong><br>${esc(state.phone.replace(/^\+852/,"").replace(/^\+86/,""))}</div>
+    </div>
+    <h2 style="margin-top:22px">${tr("notices")}</h2>
+    <div id="notices"></div>
+  `;
+  const list=document.querySelector("#notices");
+
+  NOTICES[state.lang].forEach((text,index)=>{
+    const done=index<state.noticesDone;
+    const unlocked=index<=state.noticesDone;
+    list.insertAdjacentHTML("beforeend",`
+      <div class="notice ${done?"done":unlocked?"":"locked"}">
+        <p>${text}</p>
+        <button type="button" data-notice="${index}" ${unlocked&&!done?"":"disabled"}>
+          ${done?tr("understood"):tr("understand")}
+        </button>
+      </div>
+    `);
+  });
+
+  if(state.noticesDone===NOTICES[state.lang].length){
+    list.insertAdjacentHTML("beforeend",`
+      <div class="actions">
+        <button id="to-slots">${tr("continue")}</button>
+      </div>
+    `);
+  }
+
+  list.onclick=e=>{
+    if(e.target.hasAttribute("data-notice")){
+      state.noticesDone++;
+      renderNotices();
+    }
+  };
+  document.querySelector("#to-slots")?.addEventListener("click",()=>renderSlots());
+}
+
+function renderSlots(message=""){
+  state.step="slots";
+  setProgress(3);
+
+  app.innerHTML=`
+    <h2>${tr("chooseSlot")}</h2>
+    <p class="muted">${tr("slotHelp")}</p>
+    ${message?`<p class="error">${esc(message)}</p>`:""}
+
+    <div class="date-group">
+      <h3>${dateLabel("2026-10-04")}</h3>
+      <div class="paired-choice-list">
+        ${Object.entries(PLAN).map(([id,p])=>`
+          <button class="choice paired-choice ${state.slotId===id?"selected":""}" type="button" data-slot="${id}">
+            <strong>${orderLabel(p.order)}</strong>
+            <span>
+              ${p.order==="POLYU_FIRST"
+                ? `理工 ${esc(slotParts(p.polyu).time)}　→　屯門 ${esc(slotParts(p.tmh).time)}`
+                : `屯門 ${esc(slotParts(p.tmh).time)}　→　理工 ${esc(slotParts(p.polyu).time)}`
+              }
+            </span>
+          </button>
+        `).join("")}
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="secondary" id="back">${tr("back")}</button>
+      <button id="submit">${tr("submit")}</button>
+    </div>
+  `;
+
+  app.querySelectorAll("[data-slot]").forEach(btn=>{
+    btn.onclick=()=>{
+      state.slotId=btn.dataset.slot;
+      renderSlots();
+    };
+  });
+  document.querySelector("#back").onclick=renderNotices;
+  document.querySelector("#submit").onclick=submitStandby;
+}
+
+async function submitStandby(e){
+  if(!state.slotId) return renderSlots(tr("needSlot"));
+  e.target.disabled=true;
+  e.target.textContent=tr("submitting");
+  try{
+    const result=await api({
+      action:"standbySelect",
+      phone:state.phone,
+      slotId:state.slotId,
+      acknowledged:true
+    });
+    if(result.waitlisted){
+      renderWaitlist();
+    }else{
+      renderFinal();
+    }
+  }catch(err){
+    e.target.disabled=false;
+    e.target.textContent=tr("submit");
+    const msg = err.code==="ALREADY_BOOKED"
+      ? tr("alreadyBooked")
+      : err.code==="ALREADY_REGISTERED"
+        ? tr("alreadyRegistered")
+        : tr("genericError");
+    renderSlots(msg);
+  }
+}
+
+function renderWaitlist(){
+  state.step="waitlist";
+  setProgress(4);
+  app.innerHTML=`
+    <h2 class="success">${tr("waitlistTitle")}</h2>
+    <div class="important"><strong>${tr("waitlistBody")}</strong></div>
+    <div class="actions">
+      <a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a>
+    </div>
+  `;
+}
+
+function renderFinal(){
+  state.step="final";
+  setProgress(4);
+  const p=state.participant;
+  const a=PLAN[state.slotId];
+  const qr=a.qr;
+  const firstPolyu=a.order==="POLYU_FIRST";
+
+  const card=(site,value,note,cls)=>`
+    <div class="appointment ${cls}">
+      <span>${site}：${tr("fixedScan")}</span>
+      <strong>${dateLabel(value)}<br>${esc(slotParts(value).time)}</strong>
+      <small><strong>${tr("arrival")}：${esc(arrivalTime(value))}</strong></small>
+      <p class="muted compact" style="margin-top:10px">${note}</p>
+    </div>
+  `;
+
+  const cards=firstPolyu
+    ? card(tr("polyu"),a.polyu,tr("polyuSignal"),"fixed")+card(tr("tmh"),a.tmh,tr("tmhMeet"),"suggested")
+    : card(tr("tmh"),a.tmh,tr("tmhMeet"),"suggested")+card(tr("polyu"),a.polyu,tr("polyuSignal"),"fixed");
+
+  app.innerHTML=`
+    <h2 class="success">${tr("candidateTitle")}</h2>
+    <p class="study-title">${tr("footer")}</p>
+
+    <div class="important">
+      <strong>${tr("candidateWarning")}</strong>
+    </div>
+
+    <div class="summary">
+      <div><strong>${tr("participant")}</strong><br>${esc(p.name)}</div>
+      <div><strong>${tr("order")}</strong><br>${orderLabel(a.order)}</div>
+    </div>
+
+    ${cards}
+
+    <address>
+      <strong>${tr("polyu")}</strong><br>
+      Z座地下二樓 ZB217<br>UBSN 神經科學實驗室<br>
+      ${tr("contact")}
+    </address>
+
+    <address>
+      <strong>${tr("tmh")}</strong><br>
+      主座地下放射科（X光部門）<br>新界屯門青松觀路23號<br>
+      ${tr("contact")}
+    </address>
+
+    <section class="preparation">
+      <h3>${tr("routes")}</h3>
+      <div class="actions">
+        <a class="button-link" href="${FILES.polyuGuide}" target="_blank" rel="noopener">${tr("polyuRoute")}</a>
+        <a class="button-link" href="${FILES.tmhGuide}" target="_blank" rel="noopener">${tr("tmhRoute")}</a>
+      </div>
+    </section>
+
+    <p class="important">
+      <strong>${tr("travel")}</strong>
+    </p>
+
+    <section class="preparation">
+      <h3>${tr("preparation")}</h3>
+      ${preparationList()}
+    </section>
+
+    <section class="incentive">
+      <h3>${tr("incentive")}</h3>
+      <p><strong>${tr("incentiveText")}</strong></p>
+    </section>
+
+    <section class="preparation">
+      <h3>${tr("docs")}</h3>
+      <div class="actions">
+        <a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">${state.lang==="zh"?"參加者須知":"Information sheet"}</a>
+        <a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${state.lang==="zh"?"同意書":"Consent form"}</a>
+      </div>
+    </section>
+
+    <div class="qr">
+      <h3>${tr("qr")}</h3>
+      <img src="${esc(qr)}" alt="Campus entry QR code">
+      <a class="button-link" href="${esc(qr)}" target="_blank" rel="noopener">${tr("qrSave")}</a>
+    </div>
+  `;
+}
+
+document.querySelector("#language").addEventListener("click",()=>{
+  state.lang=state.lang==="zh"?"en":"zh";
+  translatePage();
+  const render={
+    phone:renderPhone,
+    notices:renderNotices,
+    slots:renderSlots,
+    waitlist:renderWaitlist,
+    final:renderFinal
+  }[state.step];
+  if(render) render();
+});
+
+translatePage();
+renderPhone();
