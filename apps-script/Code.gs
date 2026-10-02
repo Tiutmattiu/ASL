@@ -116,6 +116,37 @@ function standbySignup_(request) {
   }
 }
 
+function standbySelect_(request) {
+  const phone = normalizePhone_(request.phone);
+  const slotId = String(request.slotId || "").trim();
+  if (!phone) fail_("BAD_PHONE","Valid phone number is required");
+  if (!STANDBY_SLOTS[slotId]) fail_("BAD_SLOT","Invalid standby slot");
+  if (request.acknowledged !== true) fail_("NOT_ACKNOWLEDGED","Instructions must be acknowledged");
+
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) fail_("BUSY","Sheet is busy; please try again");
+  try {
+    const participant = findParticipant_(phone);
+    if (!participant) fail_("NOT_FOUND","Phone number not found");
+    if (participant.polyuTime) fail_("ALREADY_BOOKED","Participant already has a confirmed appointment");
+    if (participant.status === "COMPLETED") fail_("NOT_ELIGIBLE","Participant record is completed");
+
+    let ctx = sheetContext_();
+    ensureHeaders_(ctx.sheet, STANDBY_HEADERS);
+    ctx = sheetContext_();
+
+    setByHeader_(ctx.sheet, participant.row, ctx.map, "Status", "STANDBY_1004");
+    setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby preferences", slotId + ": " + STANDBY_SLOTS[slotId]);
+    setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby timestamp", new Date());
+    setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby information acknowledged", "YES");
+    SpreadsheetApp.flush();
+
+    return { standby:true, slotId:slotId };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
 function ensureHeaders_(sheet, headers) {
   const lastColumn = Math.max(sheet.getLastColumn(),1);
   const existing = sheet.getRange(1,1,1,lastColumn).getDisplayValues()[0].map(x => String(x || "").trim());
