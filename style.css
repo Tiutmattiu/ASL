@@ -13,3 +13,12 @@ ul{padding-left:1.25rem}li{margin:8px 0;line-height:1.45}.qr{text-align:center}.
 footer{padding:24px 0 36px;color:#66807c;font-size:.82rem;text-align:center}
 @media(max-width:560px){header,main,footer{width:min(100% - 20px,760px)}header{padding-top:18px}.card{border-radius:17px}.profile-grid{grid-template-columns:1fr}.profile-grid button,.profile-grid .success{grid-column:auto}.contact-actions .button-link{flex:1}}
 @media print{body{background:#fff}header,.progress,footer,.contact-actions{display:none!important}main{width:100%}.card{border:0;box-shadow:none}.panel,.appointment{break-inside:avoid}}
+.standby-grid{grid-template-columns:1fr}
+.standby-choice{display:block;min-height:0;padding:16px;cursor:pointer}
+.standby-choice:hover{border-color:#0b7165;background:#e9f5f2}
+.standby-choice input[type="checkbox"]{width:20px;min-height:20px;margin:0;flex:0 0 auto}
+.slot-choice-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.slot-site{margin:7px 0;line-height:1.45}
+.standby-choice small{margin-top:10px}
+.study-intro{margin-bottom:18px}
+.notice-list .notice{margin:10px 0}
