@@ -5,6 +5,21 @@ const FILES = {
   tmhGuide: "assets/polyu-to-tmh.pdf"
 };
 
+const PENDING_PLAN = {
+  B: {
+    polyuTime:"2026-10-04 13:00–13:30",
+    tmhTime:"2026-10-04 15:00–15:30",
+    order:"POLYU_FIRST",
+    qr:"https://drive.google.com/thumbnail?id=1Lid_keX_jGDryzDUmKMq2fw080LTRPzP&sz=w1000"
+  },
+  D: {
+    polyuTime:"2026-10-04 16:30–17:00",
+    tmhTime:"2026-10-04 13:30–14:00",
+    order:"TMH_FIRST",
+    qr:"https://drive.google.com/thumbnail?id=1PnPcDVYIQP_XFe8enpLHE9VVUjXLoZOX&sz=w1000"
+  }
+};
+
 const T = {
   zh: {
     title: "ASL 研究參加者頁面",
@@ -60,6 +75,9 @@ const T = {
     changeText: "目前所有掃描時段已額滿。如需更改，請直接聯絡 91230084。研究團隊確認新的安排前，原有預約仍然有效。",
     waitlist: "你目前在候補名單中。所有掃描時段已額滿，如有空缺研究團隊會直接聯絡你。",
     closed: "目前沒有已確認的掃描時間。如有疑問請聯絡 91230084。",
+    pendingTitle: "已提交候補安排",
+    pendingWarning: "你已提交以下候補安排，但目前尚未正式確認。只有收到研究團隊以電話或 WhatsApp 明確確認後，才代表預約成功；未收到確認請不要自行前往。",
+    pendingWaitlist: "你已加入以下安排的候補名單。如該安排再次有空缺，研究團隊會聯絡你。",
     completed: "兩次掃描已完成，謝謝你的參與。",
     qr: "PolyU 校園入場二維碼",
     qrSave: "查看 / 儲存二維碼"
@@ -118,6 +136,9 @@ const T = {
     changeText: "All scan slots are currently full. Please contact 91230084 directly. Your existing appointment remains valid until the study team confirms a new arrangement.",
     waitlist: "You are currently on the waitlist. All scan slots are full; the study team will contact you directly if a place becomes available.",
     closed: "There is no confirmed scan time at present. Please contact 91230084 if you have any questions.",
+    pendingTitle: "Standby arrangement submitted",
+    pendingWarning: "You have submitted the standby arrangement below, but it is not yet a confirmed appointment. It is confirmed only after the study team explicitly confirms it by phone or WhatsApp. Do not attend unless you receive confirmation.",
+    pendingWaitlist: "You are on the waitlist for the arrangement below. The study team will contact you if it becomes available again.",
     completed: "Both scans are complete. Thank you for taking part.",
     qr: "PolyU campus entry QR code",
     qrSave: "View / save QR code"
@@ -222,6 +243,12 @@ async function lookup(event) {
   }
 }
 
+function standbyPlanForParticipant(p) {
+  const pref = String(p?.standbyPreference || "");
+  const id = pref.split(":")[0].trim();
+  return PENDING_PLAN[id] || null;
+}
+
 function scanCard(title, value, extra, cls = "") {
   const p = splitSlot(value);
   return `
@@ -237,6 +264,72 @@ function renderPortal() {
   const p = state.participant;
   document.querySelector("#progress").textContent = "";
   if (!p) return renderPhone();
+
+  const pending = !p.appointment ? standbyPlanForParticipant(p) : null;
+
+  if (!p.appointment && pending) {
+    const firstPolyu = pending.order !== "TMH_FIRST";
+    const cards = firstPolyu
+      ? scanCard(tr("polyu"), pending.polyuTime, tr("polyuSignal"), "fixed") + scanCard(tr("tmh"), pending.tmhTime, tr("tmhMeet"), "hospital")
+      : scanCard(tr("tmh"), pending.tmhTime, tr("tmhMeet"), "hospital") + scanCard(tr("polyu"), pending.polyuTime, tr("polyuSignal"), "fixed");
+
+    app.innerHTML = `
+      <h2>${tr("hello")}, ${esc(p.name)}</h2>
+      <section>
+        <h3>${tr("pendingTitle")}</h3>
+        <div class="important">${p.status === "WAITLIST" ? tr("pendingWaitlist") : tr("pendingWarning")}</div>
+        <p class="muted"><strong>${tr("order")}：</strong>${orderLabel(pending.order)}</p>
+        ${cards}
+      </section>
+
+      <address>
+        <strong>${tr("polyu")}</strong><br>
+        Z座地下二樓 ZB217<br>UBSN 神經科學實驗室<br>
+        ${tr("contact")}
+      </address>
+
+      <address>
+        <strong>${tr("tmh")}</strong><br>
+        主座地下放射科（X光部門）<br>新界屯門青松觀路23號<br>
+        ${tr("contact")}
+      </address>
+
+      <section class="panel">
+        <h3>${tr("guides")}</h3>
+        <div class="link-grid">
+          ${fileLink(FILES.polyuGuide, tr("polyuGuide"))}
+          ${fileLink(FILES.tmhGuide, tr("tmhGuide"))}
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>${tr("preparation")}</h3>
+        <ul>${tr("prepItems").map(x => `<li>${x}</li>`).join("")}</ul>
+      </section>
+
+      ${profileSection(p)}
+
+      <section class="panel">
+        <h3>${tr("docs")}</h3>
+        <p>${tr("infoText")}</p>
+        ${fileLink(FILES.info, tr("infoButton"))}
+        <p>${tr("consentText")}</p>
+        <a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${tr("consentButton")}</a>
+        <p class="important compact">${tr("returnText")}</p>
+      </section>
+
+      ${pending.qr ? `
+        <section class="panel qr">
+          <h3>${tr("qr")}</h3>
+          <img src="${esc(safeUrl(pending.qr))}" alt="Campus entry QR code">
+          <a class="button-link" href="${esc(safeUrl(pending.qr))}" target="_blank" rel="noopener">${tr("qrSave")}</a>
+        </section>` : ""}
+
+      ${contactButtons()}`;
+
+    document.querySelector("#profile-form")?.addEventListener("submit", saveProfile);
+    return;
+  }
 
   if (!p.appointment) {
     app.innerHTML = `
