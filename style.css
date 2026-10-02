@@ -166,3 +166,15 @@ address{
   .paired-choice strong{display:block;margin-bottom:8px}
   .paired-choice span{display:block;text-align:left}
 }
+
+/* Uniform document link buttons */
+.button-link,
+.button-link.secondary-link{
+  color:#fff;
+  background:#0b7165;
+}
+.button-link:hover,
+.button-link.secondary-link:hover{
+  color:#fff;
+  background:#085b52;
+}
