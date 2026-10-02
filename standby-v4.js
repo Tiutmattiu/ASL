@@ -62,6 +62,7 @@ const T = {
     phoneHelp:"請使用你在研究登記時提供的電話號碼。系統會直接讀取你已登記的資料，不需要重新填寫姓名、年齡或性別。",
     phone:"電話號碼",
     continue:"繼續",
+    back:"返回",
     finding:"正在查找…",
     notFound:"找不到這個電話號碼，請確認已完成第一階段研究登記，或直接聯絡 91230084。",
     genericError:"暫時無法連接系統，請稍後再試。",
@@ -107,6 +108,7 @@ const T = {
     phoneHelp:"Use the phone number provided during study registration. Your existing details will be loaded automatically; you do not need to re-enter your name, age or sex.",
     phone:"Phone number",
     continue:"Continue",
+    back:"Back",
     finding:"Looking up…",
     notFound:"We could not find that phone number. Please make sure you completed the first-stage study registration, or contact 91230084.",
     genericError:"The service is temporarily unavailable. Please try again later.",
@@ -318,7 +320,7 @@ function renderNotices(){
       renderNotices();
     }
   };
-  document.querySelector("#to-slots")?.addEventListener("click",renderSlots);
+  document.querySelector("#to-slots")?.addEventListener("click",()=>renderSlots());
 }
 
 function renderSlots(message=""){
