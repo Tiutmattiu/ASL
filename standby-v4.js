@@ -14,35 +14,11 @@ const PLAN = {
     order:"POLYU_FIRST",
     qr:"https://drive.google.com/thumbnail?id=1Lid_keX_jGDryzDUmKMq2fw080LTRPzP&sz=w1000"
   },
-  C: {
-    polyu:"2026-10-04 16:00–16:30",
-    tmh:"2026-10-04 13:00–13:30",
-    order:"TMH_FIRST",
-    qr:"https://drive.google.com/thumbnail?id=1RiKxjAKdtanNQ7CAH6-rcWS9GiApOBVN&sz=w1000"
-  },
   D: {
     polyu:"2026-10-04 16:30–17:00",
     tmh:"2026-10-04 13:30–14:00",
     order:"TMH_FIRST",
     qr:"https://drive.google.com/thumbnail?id=1PnPcDVYIQP_XFe8enpLHE9VVUjXLoZOX&sz=w1000"
-  },
-  E: {
-    polyu:"2026-10-04 17:00–17:30",
-    tmh:"2026-10-04 14:00–14:30",
-    order:"TMH_FIRST",
-    qr:"https://drive.google.com/thumbnail?id=17B5BNtJAX0rw_JcjcMfJ3j8c57QYZjEG&sz=w1000"
-  },
-  F: {
-    polyu:"2026-10-04 17:30–18:00",
-    tmh:"2026-10-04 14:30–15:00",
-    order:"TMH_FIRST",
-    qr:"https://drive.google.com/thumbnail?id=1FsLqQFn-5U-xrEe1b2Ez3N4OnDLal78j&sz=w1000"
-  },
-  G: {
-    polyu:"2026-10-04 18:00–18:30",
-    tmh:"2026-10-04 15:30–16:00",
-    order:"TMH_FIRST",
-    qr:"https://drive.google.com/thumbnail?id=1Lid_keX_jGDryzDUmKMq2fw080LTRPzP&sz=w1000"
   }
 };
 
