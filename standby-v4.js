@@ -19,6 +19,12 @@ const PLAN = {
     tmh:"2026-10-04 13:30–14:00",
     order:"TMH_FIRST",
     qr:"https://drive.google.com/thumbnail?id=1PnPcDVYIQP_XFe8enpLHE9VVUjXLoZOX&sz=w1000"
+  },
+  H: {
+    polyu:"2026-10-10 14:30–15:00",
+    tmh:"2026-10-10 12:00–12:30",
+    order:"TMH_FIRST",
+    qr:"https://drive.google.com/thumbnail?id=17B5BNtJAX0rw_JcjcMfJ3j8c57QYZjEG&sz=w1000"
   }
 };
 
@@ -26,7 +32,7 @@ const NOTICES = {
   zh: [
     `請先閱讀完整的<strong>《參加者須知》</strong>.然後閱讀同意書。<br><br><strong>MRI 意外發現是什麼？</strong><br>MRI 意外發現是指研究掃描中偶然發現可能需要進一步醫療評估的異常，例如疑似<strong>腦出血、中風、腫瘤</strong>或其他明顯異常。研究 MRI 並不是正式的臨床診斷檢查，也不會提供常規影像報告。<br><br>如果你在同意書中勾選<strong>「希望得到通知」</strong>：若研究人員在影像中發現上述可能具有臨床意義的異常，我們會在發現後聯絡你。<br><br>如果你勾選<strong>「不希望得到通知」</strong>：即使研究影像中發現可能的異常，我們也不會因本研究的影像結果主動通知你。<br><br>如果之後正式確認參加，請在同意書中選擇其中一項，並填寫姓名、簽署及日期。<div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">參加者須知</a><a class="button-link secondary-link" href="${FILES.consent}" target="_blank" rel="noopener">同意書</a></div>`,
     "你需要在<strong>同一天</strong>完成香港理工大學及屯門醫院兩次 MRI 掃描。",
-    "香港理工大學及屯門醫院的<strong>掃描時間均為固定時間</strong>；系統會按照你選擇的理工時段自動配對另一個地點的時間及掃描次序。",
+    "香港理工大學及屯門醫院的<strong>掃描時間均為固定時間</strong>；請先選擇你希望先到哪一個地點，再選擇該地點目前可配合的時間。另一個地點的時間會按照固定配對自動安排。",
     "兩個地點都建議在<strong>掃描時間前約 30 分鐘到達</strong>。",
     "掃描前請保持<strong>至少 2 小時未進食</strong>。",
     "掃描當天<strong>請勿吸煙、飲酒、飲用咖啡或茶</strong>，並避免能量飲品及其他含咖啡因產品。",
@@ -40,7 +46,7 @@ const NOTICES = {
   en: [
     `Please first read the full <strong>Participant Information Sheet</strong>. You may also review the consent form now.<br><br><strong>What is an incidental MRI finding?</strong><br>This means an unexpected abnormality noticed during the research scan that may require further medical assessment, for example a suspected <strong>brain haemorrhage, stroke, tumour</strong>, or another obvious abnormality. A research MRI is not a formal clinical diagnostic examination and does not provide a routine radiology report.<br><br>If you select <strong>“I wish to be notified”</strong>: if the researchers identify a potentially clinically significant abnormality, we will contact you after it is found.<br><br>If you select <strong>“I do not wish to be notified”</strong>: even if a possible abnormality is seen on the research images, we will not proactively notify you on the basis of the research images.<br><br>If you are later formally confirmed, please choose one option on the consent form, then enter your name, sign and date it.<div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">Information sheet</a><a class="button-link secondary-link" href="${FILES.consent}" target="_blank" rel="noopener">Consent form</a></div>`,
     "You must complete both MRI scans at <strong>PolyU and Tuen Mun Hospital on the same day</strong>.",
-    "The scan times at <strong>both locations are fixed</strong>. The system will automatically pair the second scan time and scan order with the PolyU time you choose.",
+    "The scan times at <strong>both locations are fixed</strong>. First choose which location you can attend first, then choose an available time at that location. The second scan time is paired automatically.",
     "Please arrive about <strong>30 minutes before the scan time at both locations</strong>.",
     "Please <strong>do not eat for at least 2 hours</strong> before scanning.",
     "On the scan day, <strong>do not smoke, drink alcohol, coffee or tea</strong>, and avoid energy drinks and other caffeinated products.",
@@ -72,8 +78,12 @@ const T = {
     notices:"請逐項閱讀",
     understand:"我知道了",
     understood:"已明白 ✓",
-    chooseSlot:"選擇你可以配合的理工大學掃描時間",
-    slotHelp:"只需要選擇一個理工大學時間。屯門醫院時間及掃描次序會按照固定配對自動安排。",
+    chooseSite:"你希望先去哪一個掃描地點？",
+    siteHelp:"請先選擇第一個掃描地點，再選擇該地點目前可配合的固定掃描時間。另一個地點會按照固定配對自動安排。",
+    chooseSlot:"選擇第一個掃描地點的時間",
+    slotHelp:"只需要選擇一個時間；另一個地點的固定掃描時間會自動配對。",
+    polyuFirst:"先到香港理工大學",
+    tmhFirst:"先到屯門醫院",
     selected:"已選擇",
     submit:"提交候補",
     submitting:"正在提交…",
@@ -118,8 +128,12 @@ const T = {
     notices:"Please read each item",
     understand:"I understand",
     understood:"Understood ✓",
-    chooseSlot:"Choose a PolyU scan time you could attend",
-    slotHelp:"Choose one PolyU time only. The Tuen Mun Hospital time and scan order are paired automatically.",
+    chooseSite:"Which scan location can you attend first?",
+    siteHelp:"Choose the first scan location, then choose an available fixed scan time at that location. The second scan time is paired automatically.",
+    chooseSlot:"Choose the first scan time",
+    slotHelp:"Choose one time only; the fixed time at the second location is paired automatically.",
+    polyuFirst:"PolyU first",
+    tmhFirst:"Tuen Mun Hospital first",
     selected:"Selected",
     submit:"Submit standby",
     submitting:"Submitting…",
@@ -154,6 +168,7 @@ const state = {
   phone:"",
   participant:null,
   noticesDone:0,
+  firstSite:"",
   slotId:""
 };
 
@@ -167,7 +182,7 @@ function esc(value=""){
 }
 
 function setProgress(n){
-  document.querySelector("#progress").textContent=n?`${tr("step")} ${n} / 4`:"";
+  document.querySelector("#progress").textContent=n?`${tr("step")} ${n} / 5`:"";
 }
 
 function translatePage(){
@@ -191,8 +206,13 @@ function arrivalTime(value){
   return String(Math.floor(x/60)).padStart(2,"0")+":"+String(x%60).padStart(2,"0");
 }
 
-function dateLabel(){
-  return state.lang==="zh"?"2026 年 10 月 4 日":"4 October 2026";
+function dateLabel(value){
+  const date=slotParts(value).date || String(value || "");
+  const map={
+    "2026-10-04": state.lang==="zh" ? "2026 年 10 月 4 日" : "4 October 2026",
+    "2026-10-10": state.lang==="zh" ? "2026 年 10 月 10 日" : "10 October 2026"
+  };
+  return map[date] || date;
 }
 
 function orderLabel(order){
@@ -320,26 +340,70 @@ function renderNotices(){
       renderNotices();
     }
   };
-  document.querySelector("#to-slots")?.addEventListener("click",()=>renderSlots());
+  document.querySelector("#to-slots")?.addEventListener("click",renderSite);
+}
+
+function renderSite(){
+  state.step="site";
+  setProgress(3);
+  app.innerHTML=`
+    <h2>${tr("chooseSite")}</h2>
+    <p class="muted">${tr("siteHelp")}</p>
+
+    <button class="choice" type="button" data-site="POLYU_FIRST">
+      <strong>${tr("polyuFirst")}</strong>
+    </button>
+
+    <button class="choice" type="button" data-site="TMH_FIRST">
+      <strong>${tr("tmhFirst")}</strong>
+    </button>
+
+    <div class="actions">
+      <button class="secondary" id="back">${tr("back")}</button>
+    </div>
+  `;
+
+  app.querySelectorAll("[data-site]").forEach(btn=>{
+    btn.onclick=()=>{
+      state.firstSite=btn.dataset.site;
+      state.slotId="";
+      renderSlots();
+    };
+  });
+  document.querySelector("#back").onclick=renderNotices;
 }
 
 function renderSlots(message=""){
   state.step="slots";
-  setProgress(3);
+  setProgress(4);
+
+  const entries=Object.entries(PLAN).filter(([,p])=>p.order===state.firstSite);
+  const groups={};
+  entries.forEach(([id,p])=>{
+    const firstValue=p.order==="POLYU_FIRST"?p.polyu:p.tmh;
+    const date=slotParts(firstValue).date;
+    (groups[date] ||= []).push([id,p,firstValue]);
+  });
+
   app.innerHTML=`
     <h2>${tr("chooseSlot")}</h2>
     <p class="muted">${tr("slotHelp")}</p>
     ${message?`<p class="error">${esc(message)}</p>`:""}
-    <div class="date-group">
-      <h3>${dateLabel()}</h3>
-      <div class="slot-grid simple-slot-grid">
-        ${Object.entries(PLAN).map(([id,p])=>`
-          <button class="choice simple-time ${state.slotId===id?"selected":""}" type="button" data-slot="${id}">
-            ${esc(slotParts(p.polyu).time)}
-          </button>
-        `).join("")}
-      </div>
+    <div id="slot-groups">
+      ${Object.entries(groups).map(([date,items])=>`
+        <div class="date-group">
+          <h3>${dateLabel(date)}</h3>
+          <div class="slot-grid simple-slot-grid">
+            ${items.map(([id,p,firstValue])=>`
+              <button class="choice simple-time ${state.slotId===id?"selected":""}" type="button" data-slot="${id}">
+                ${esc(slotParts(firstValue).time)}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      `).join("")}
     </div>
+
     <div class="actions">
       <button class="secondary" id="back">${tr("back")}</button>
       <button id="submit">${tr("submit")}</button>
@@ -352,7 +416,7 @@ function renderSlots(message=""){
       renderSlots();
     };
   });
-  document.querySelector("#back").onclick=renderNotices;
+  document.querySelector("#back").onclick=renderSite;
   document.querySelector("#submit").onclick=submitStandby;
 }
 
@@ -378,7 +442,7 @@ async function submitStandby(e){
 
 function renderFinal(){
   state.step="final";
-  setProgress(4);
+  setProgress(5);
   const p=state.participant;
   const a=PLAN[state.slotId];
   const qr=a.qr;
@@ -387,7 +451,7 @@ function renderFinal(){
   const card=(site,value,note,cls)=>`
     <div class="appointment ${cls}">
       <span>${site}：${tr("fixedScan")}</span>
-      <strong>${dateLabel()}<br>${esc(slotParts(value).time)}</strong>
+      <strong>${dateLabel(value)}<br>${esc(slotParts(value).time)}</strong>
       <small><strong>${tr("arrival")}：${esc(arrivalTime(value))}</strong></small>
       <p class="muted compact" style="margin-top:10px">${note}</p>
     </div>
@@ -468,6 +532,7 @@ document.querySelector("#language").addEventListener("click",()=>{
   const render={
     phone:renderPhone,
     notices:renderNotices,
+    site:renderSite,
     slots:renderSlots,
     final:renderFinal
   }[state.step];
