@@ -84,7 +84,16 @@ const T = {
     understand:"我知道了",
     understood:"已明白 ✓",
     choose:"選擇一個掃描安排",
-    chooseHelp:"以下兩個安排均為固定配對。搶到即為正式預約；若該安排已被其他參加者預約，系統會將你加入候補名單。",
+    chooseHelp:"請選擇最適合你的安排；不必勉強選擇目前的 10 月 4 日時段。",
+    oct10Choice:"候補 10 月 10 日掃描",
+    oct10Help:"如果 10 月 10 日有空缺，研究團隊會再聯絡你確認具體時間。",
+    unavailableChoice:"以上日期都不方便",
+    unavailableHelp:"不加入目前候補名單；我們只記錄這個選擇。",
+    submitChoice:"提交選擇",
+    oct10WaitlistTitle:"已加入 10 月 10 日候補名單",
+    oct10WaitlistBody:"如 10 月 10 日出現合適空缺，研究團隊會聯絡你確認具體掃描時間。未收到確認前請勿自行前往。",
+    unavailableTitle:"已記錄",
+    unavailableBody:"已記錄目前提供的日期都不方便，不會為你建立預約或候補時段。",
     back:"返回",
     book:"確認預約",
     booking:"正在處理…",
@@ -153,7 +162,16 @@ const T = {
     understand:"I understand",
     understood:"Understood ✓",
     choose:"Choose one scan arrangement",
-    chooseHelp:"Both options are fixed paired arrangements. If available, your booking is confirmed immediately. If it has already been booked, you will be added to the waitlist.",
+    chooseHelp:"Choose the option that actually works for you. You do not need to select one of the 4 October slots.",
+    oct10Choice:"Waitlist for 10 October",
+    oct10Help:"If a suitable place becomes available on 10 October, the study team will contact you to confirm the exact time.",
+    unavailableChoice:"None of these dates work",
+    unavailableHelp:"You will not be added to the current waitlist; we will only record this choice.",
+    submitChoice:"Submit choice",
+    oct10WaitlistTitle:"Added to the 10 October waitlist",
+    oct10WaitlistBody:"If a suitable place becomes available on 10 October, the study team will contact you to confirm the exact scan time. Please do not attend unless contacted.",
+    unavailableTitle:"Preference recorded",
+    unavailableBody:"We recorded that the currently offered dates do not work for you. No booking or waitlist place has been created.",
     back:"Back",
     book:"Confirm booking",
     booking:"Processing…",
@@ -192,7 +210,7 @@ const T = {
   }
 };
 
-const state={lang:"zh",step:"phone",phone:"",participant:null,noticesDone:0,slotId:"",openSlots:[]};
+const state={lang:"zh",step:"phone",phone:"",participant:null,noticesDone:0,choice:"",openSlots:[],compactFlow:false};
 const app=document.querySelector("#app");
 const tr=key=>T[state.lang][key];
 
@@ -264,14 +282,18 @@ async function lookup(e){
       return;
     }
 
-    if(state.openSlots.length===0){
-      await api({action:"joinWaitlist",phone:state.phone});
-      state.participant.status="WAITLIST";
-      state.participant.waitlistPreference="ANY";
-      renderWaitlist(null);
+    if(String(state.participant.waitlistPreference||"").startsWith("NONE")){
+      renderUnavailable();
       return;
     }
 
+    if(state.openSlots.length===0){
+      state.compactFlow=true;
+      renderChoicesOnly();
+      return;
+    }
+
+    state.compactFlow=false;
     renderProfile();
   }catch(err){
     renderPhone(err.code==="NOT_FOUND"?tr("notFound"):tr("error"));
@@ -388,55 +410,175 @@ function renderNotices(){
   }
 }
 
-function renderSlots(message=""){
-  state.step="slots";
-  setProgress(4);
+function choiceButtons(){
+  const october4=Object.entries(PLAN)
+    .filter(([id])=>state.openSlots.includes(id))
+    .map(([id,p])=>`
+      <button class="choice paired-choice ${state.choice===id?"selected":""}" type="button" data-choice="${id}">
+        <strong>${orderLabel(p.order)}</strong>
+        <span>${p.order==="POLYU_FIRST"
+          ?`理工 ${esc(splitSlot(p.polyuTime).time)}　→　屯門 ${esc(splitSlot(p.tmhTime).time)}`
+          :`屯門 ${esc(splitSlot(p.tmhTime).time)}　→　理工 ${esc(splitSlot(p.polyuTime).time)}`}</span>
+      </button>`)
+    .join("");
 
-  const options=Object.entries(PLAN).filter(([id])=>state.openSlots.includes(id));
+  return `
+    ${october4}
+
+    <button class="choice paired-choice ${state.choice==="OCT10"?"selected":""}" type="button" data-choice="OCT10">
+      <strong>${tr("oct10Choice")}</strong>
+      <span>${tr("oct10Help")}</span>
+    </button>
+
+    <button class="choice paired-choice ${state.choice==="NONE"?"selected":""}" type="button" data-choice="NONE">
+      <strong>${tr("unavailableChoice")}</strong>
+      <span>${tr("unavailableHelp")}</span>
+    </button>`;
+}
+
+function bindChoiceScreen(){
+  app.querySelectorAll("[data-choice]").forEach(btn=>{
+    btn.onclick=()=>{
+      state.choice=btn.dataset.choice;
+      state.compactFlow?renderChoicesOnly():renderSlots();
+    };
+  });
+
+  const submit=document.querySelector("#book");
+  if(submit) submit.onclick=submitChoice;
+}
+
+function renderChoicesOnly(message=""){
+  state.step="choicesOnly";
+  setProgress(2);
 
   app.innerHTML=`
     <h2>${tr("choose")}</h2>
     <p class="muted">${tr("chooseHelp")}</p>
     ${message?`<p class="error">${esc(message)}</p>`:""}
-    <div class="paired-choice-list">
-      ${options.map(([id,p])=>`
-        <button class="choice paired-choice ${state.slotId===id?"selected":""}" type="button" data-slot="${id}">
-          <strong>${orderLabel(p.order)}</strong>
-          <span>${p.order==="POLYU_FIRST"
-            ?`理工 ${esc(splitSlot(p.polyuTime).time)}　→　屯門 ${esc(splitSlot(p.tmhTime).time)}`
-            :`屯門 ${esc(splitSlot(p.tmhTime).time)}　→　理工 ${esc(splitSlot(p.polyuTime).time)}`}</span>
-        </button>`).join("")}
-    </div>
+    <div class="paired-choice-list">${choiceButtons()}</div>
     <div class="actions">
-      <button class="secondary" id="back" type="button">${tr("back")}</button>
-      <button id="book" type="button">${tr("book")}</button>
+      <button id="book" type="button">${tr("submitChoice")}</button>
     </div>`;
 
-  app.querySelectorAll("[data-slot]").forEach(btn=>{
-    btn.onclick=()=>{
-      state.slotId=btn.dataset.slot;
-      renderSlots();
-    };
-  });
+  bindChoiceScreen();
+}
+
+function renderSlots(message=""){
+  state.step="slots";
+  setProgress(4);
+
+  app.innerHTML=`
+    <h2>${tr("choose")}</h2>
+    <p class="muted">${tr("chooseHelp")}</p>
+    ${message?`<p class="error">${esc(message)}</p>`:""}
+    <div class="paired-choice-list">${choiceButtons()}</div>
+    <div class="actions">
+      <button class="secondary" id="back" type="button">${tr("back")}</button>
+      <button id="book" type="button">${tr("submitChoice")}</button>
+    </div>`;
 
   document.querySelector("#back").onclick=()=>renderNotices();
-  document.querySelector("#book").onclick=submitBooking;
+  bindChoiceScreen();
 }
 
-async function submitBooking(e){
-  if(!state.slotId)return renderSlots(tr("needChoice"));
-  e.target.disabled=true;e.target.textContent=tr("booking");
+async function submitChoice(event){
+  if(!state.choice){
+    state.compactFlow?renderChoicesOnly(tr("needChoice")):renderSlots(tr("needChoice"));
+    return;
+  }
+
+  event.currentTarget.disabled=true;
+  event.currentTarget.textContent=tr("booking");
+
   try{
-    const result=await api({action:"bookReplacement",phone:state.phone,slotId:state.slotId,acknowledged:true});
-    if(result.waitlisted){state.participant.status="WAITLIST";state.participant.waitlistPreference=result.preference;renderWaitlist(PLAN[state.slotId]);return;}
-    state.participant.status="BOOKED";state.participant.appointment=result.appointment;renderBookedResult(result.appointment);
-  }catch{renderSlots(tr("error"));}
+    if(state.choice==="OCT10"||state.choice==="NONE"){
+      const result=await api({
+        action:"recordPreference",
+        phone:state.phone,
+        preference:state.choice
+      });
+
+      if(result.booked&&result.appointment){
+        state.participant.status="BOOKED";
+        state.participant.appointment=result.appointment;
+        renderBookedResult(result.appointment);
+        return;
+      }
+
+      state.participant.waitlistPreference=result.preference||"";
+
+      if(state.choice==="OCT10"){
+        state.participant.status="WAITLIST";
+        renderWaitlist(null);
+      }else{
+        state.participant.status="";
+        renderUnavailable();
+      }
+      return;
+    }
+
+    const result=await api({
+      action:"bookReplacement",
+      phone:state.phone,
+      slotId:state.choice,
+      acknowledged:true
+    });
+
+    if(result.waitlisted){
+      state.participant.status="WAITLIST";
+      state.participant.waitlistPreference=result.preference;
+      renderWaitlist(PLAN[state.choice]);
+      return;
+    }
+
+    state.participant.status="BOOKED";
+    state.participant.appointment=result.appointment;
+    renderBookedResult(result.appointment);
+  }catch(err){
+    state.compactFlow
+      ?renderChoicesOnly(err.message||tr("error"))
+      :renderSlots(err.message||tr("error"));
+  }
 }
+
 
 function renderWaitlist(plan){
-  state.step="waitlist";setProgress(5);
-  const p=plan||planFromPreference(state.participant.waitlistPreference);
-  app.innerHTML=`<h2>${tr("waitlistTitle")}</h2><div class="important"><strong>${tr("waitlistBody")}</strong></div>${p?`<div class="appointment"><strong>${orderLabel(p.order)}</strong><p>${p.order==="POLYU_FIRST"?`理工 ${esc(splitSlot(p.polyuTime).time)} → 屯門 ${esc(splitSlot(p.tmhTime).time)}`:`屯門 ${esc(splitSlot(p.tmhTime).time)} → 理工 ${esc(splitSlot(p.polyuTime).time)}`}</p></div>`:""}<div class="actions"><a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a></div>`;
+  state.step="waitlist";
+  setProgress(state.compactFlow?2:5);
+
+  const preference=String(state.participant.waitlistPreference||"");
+  const isOct10=preference.startsWith("OCT10");
+  const p=plan||planFromPreference(preference);
+
+  app.innerHTML=`
+    <h2>${isOct10?tr("oct10WaitlistTitle"):tr("waitlistTitle")}</h2>
+    <div class="important">
+      <strong>${isOct10?tr("oct10WaitlistBody"):tr("waitlistBody")}</strong>
+    </div>
+
+    ${p?`<div class="appointment">
+      <strong>${orderLabel(p.order)}</strong>
+      <p>${p.order==="POLYU_FIRST"
+        ?`理工 ${esc(splitSlot(p.polyuTime).time)} → 屯門 ${esc(splitSlot(p.tmhTime).time)}`
+        :`屯門 ${esc(splitSlot(p.tmhTime).time)} → 理工 ${esc(splitSlot(p.polyuTime).time)}`}</p>
+    </div>`:""}
+
+    <div class="actions">
+      <a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a>
+    </div>`;
+}
+
+function renderUnavailable(){
+  state.step="unavailable";
+  setProgress(state.compactFlow?2:5);
+
+  app.innerHTML=`
+    <h2>${tr("unavailableTitle")}</h2>
+    <div class="important"><strong>${tr("unavailableBody")}</strong></div>
+    <div class="actions">
+      <a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a>
+    </div>`;
 }
 
 function resultCard(site,value,note,cls){
@@ -515,7 +657,7 @@ function renderBookedResult(a){
 
 document.addEventListener("keydown",event=>{if(event.key!=="Enter"||state.step!=="notices")return;const tag=(event.target&&event.target.tagName||"").toUpperCase();if(["A","BUTTON","INPUT","SELECT","TEXTAREA"].includes(tag))return;const next=document.querySelector('#notices button[data-notice]:not([disabled])');const cont=document.querySelector("#to-slots");if(next){event.preventDefault();next.click();}else if(cont){event.preventDefault();cont.click();}});
 
-document.querySelector("#language").onclick=()=>{state.lang=state.lang==="zh"?"en":"zh";translatePage();const render={phone:renderPhone,profile:renderProfile,notices:renderNotices,slots:()=>renderSlots(),waitlist:()=>renderWaitlist(),booked:()=>renderBookedResult(state.participant.appointment)}[state.step];if(render)render();};
+document.querySelector("#language").onclick=()=>{state.lang=state.lang==="zh"?"en":"zh";translatePage();const render={phone:renderPhone,profile:renderProfile,notices:renderNotices,slots:()=>renderSlots(),choicesOnly:()=>renderChoicesOnly(),waitlist:()=>renderWaitlist(),unavailable:()=>renderUnavailable(),booked:()=>renderBookedResult(state.participant.appointment)}[state.step];if(render)render();};
 
 translatePage();
 renderPhone();
