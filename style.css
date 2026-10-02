@@ -25,3 +25,127 @@ footer{padding:24px 0 36px;color:#66807c;font-size:.82rem;text-align:center}
 
 .standby-review{margin:12px 0;padding:14px;border-radius:12px;background:#f4f8f7}
 .standby-review>div{padding:10px;background:white;border-radius:10px}
+
+
+/* Original booking-flow components restored for standby + confirmation UI */
+button:focus-visible,input:focus-visible,select:focus-visible{
+  outline:3px solid #8cd9cc;
+  outline-offset:2px;
+}
+.secondary{
+  color:#0b6259;
+  background:#e5f4f1;
+}
+.secondary:hover{background:#d3ece7}
+
+.notice{
+  margin:14px 0;
+  padding:16px;
+  border:1px solid #d6e4e1;
+  border-radius:14px;
+  background:#f8fbfa;
+}
+.notice.locked{opacity:.45}
+.notice.done{
+  border-color:#68b9a8;
+  background:#eaf8f4;
+}
+.notice button{
+  margin-top:10px;
+  min-height:42px;
+}
+
+.date-group{margin-top:24px}
+.slot-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(135px,1fr));
+  gap:10px;
+}
+.choice{
+  width:100%;
+  height:auto;
+  min-height:76px;
+  margin:6px 0;
+  padding:14px;
+  text-align:left;
+  color:#18443e;
+  background:#f0f7f5;
+  border:2px solid transparent;
+}
+.choice:hover{background:#e5f3f0}
+.choice.selected{
+  border-color:#0b7165;
+  background:#dcf1ec;
+}
+.choice small{
+  display:block;
+  margin-top:8px;
+  color:#426762;
+  font-weight:650;
+  line-height:1.4;
+}
+
+.important p:last-child{margin-bottom:0}
+
+.summary{
+  display:grid;
+  gap:12px;
+}
+.summary>div,address{
+  padding:14px;
+  border-radius:12px;
+  background:#f4f8f7;
+}
+
+.appointment.suggested{
+  border:1px dashed #90aaa5;
+  background:#f7f9f8;
+}
+.appointment.suggested strong{font-size:1.15rem}
+
+.study-title{
+  color:#496965;
+  font-weight:700;
+}
+.preparation,.incentive{
+  margin-top:16px;
+  padding:18px;
+  border-radius:14px;
+  background:#f4f8f7;
+}
+.preparation li{
+  margin:8px 0;
+  line-height:1.45;
+}
+.incentive{
+  border:2px solid #d5a33b;
+  background:#fff9e9;
+}
+address{
+  margin-top:14px;
+  font-style:normal;
+  line-height:1.55;
+}
+.qr{
+  margin-top:16px;
+  padding:16px;
+  border:1px dashed #90aaa5;
+  border-radius:12px;
+  text-align:center;
+}
+.qr img{
+  display:block;
+  max-width:220px;
+  margin:10px auto;
+}
+
+.simple-slot-grid{
+  grid-template-columns:repeat(auto-fit,minmax(135px,1fr));
+}
+.simple-time{
+  min-height:64px;
+  padding:14px;
+  text-align:center;
+  font-size:1.1rem;
+  font-weight:800;
+}
