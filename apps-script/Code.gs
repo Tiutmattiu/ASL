@@ -13,8 +13,7 @@ const STANDBY_HEADERS = ["Standby preferences","Standby timestamp","Standby info
 
 const STANDBY_SLOTS = {
   "B": "香港理工大學 13:00–13:30 → 屯門醫院 15:00–15:30",
-  "D": "屯門醫院 13:30–14:00 → 香港理工大學 16:30–17:00",
-  "H": "屯門醫院 12:00–12:30 → 香港理工大學 14:30–15:00（2026-10-10）"
+  "D": "屯門醫院 13:30–14:00 → 香港理工大學 16:30–17:00"
 };
 
 function doPost(e) {
@@ -122,6 +121,7 @@ function standbySelect_(request) {
 
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(10000)) fail_("BUSY","Sheet is busy; please try again");
+
   try {
     const participant = findParticipant_(phone);
     if (!participant) fail_("NOT_FOUND","Phone number not found");
@@ -132,13 +132,38 @@ function standbySelect_(request) {
     ensureHeaders_(ctx.sheet, STANDBY_HEADERS);
     ctx = sheetContext_();
 
-    setByHeader_(ctx.sheet, participant.row, ctx.map, "Status", "STANDBY_1004");
+    const lastRow = ctx.sheet.getLastRow();
+    const values = lastRow >= 2
+      ? ctx.sheet.getRange(2,1,lastRow-1,ctx.sheet.getLastColumn()).getDisplayValues()
+      : [];
+
+    const prefix = slotId + ":";
+    let taken = false;
+
+    for (let i=0;i<values.length;i++) {
+      const rowNumber = i + 2;
+      if (rowNumber === participant.row) continue;
+
+      const status = String(get_(values[i],ctx.map,"Status") || "").trim();
+      const pref = String(get_(values[i],ctx.map,"Standby preferences") || "").trim();
+
+      if (pref.indexOf(prefix) === 0 && status !== "WAITLIST") {
+        taken = true;
+        break;
+      }
+    }
+
+    setByHeader_(ctx.sheet, participant.row, ctx.map, "Status", taken ? "WAITLIST" : "STANDBY_1004");
     setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby preferences", slotId + ": " + STANDBY_SLOTS[slotId]);
     setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby timestamp", new Date());
     setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby information acknowledged", "YES");
     SpreadsheetApp.flush();
 
-    return { standby:true, slotId:slotId };
+    return {
+      standby: !taken,
+      waitlisted: taken,
+      slotId: slotId
+    };
   } finally {
     lock.releaseLock();
   }
