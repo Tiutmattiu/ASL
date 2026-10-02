@@ -519,3 +519,14 @@ document.querySelector("#language").addEventListener("click",()=>{
 
 translatePage();
 renderPhone();
+
+/* Enter advances notice sequence */
+document.addEventListener("keydown",(event)=>{
+  if(event.key!=="Enter" || state.step!=="notices") return;
+  const tag=(event.target && event.target.tagName || "").toUpperCase();
+  if(["A","BUTTON","INPUT","SELECT","TEXTAREA"].includes(tag)) return;
+  const next=document.querySelector('#notices button[data-notice]:not([disabled])');
+  const cont=document.querySelector("#to-slots");
+  if(next){event.preventDefault();next.click();}
+  else if(cont){event.preventDefault();cont.click();}
+});
