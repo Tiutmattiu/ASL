@@ -61,7 +61,8 @@ function doPost(e) {
     const handlers = {
       lookup: lookup_,
       updateProfile: updateProfile_,
-      bookReplacement: bookReplacement_
+      bookReplacement: bookReplacement_,
+      joinWaitlist: joinWaitlist_
     };
 
     if (!handlers[request.action]) {
@@ -79,14 +80,16 @@ function doPost(e) {
 }
 
 function lookup_(request) {
-  const participant = findParticipant_(request.phone);
+  const ctx = sheetContext_();
+  const participant = findParticipantInContext_(ctx, request.phone);
 
   if (!participant) {
     fail_("NOT_FOUND", "Phone number not found");
   }
 
   return {
-    participant: publicParticipant_(participant)
+    participant: publicParticipant_(participant),
+    openSlots: getOpenSlotIds_(ctx)
   };
 }
 
@@ -136,6 +139,47 @@ function updateProfile_(request) {
       weight: weight,
       handedness: handednessInput || participant.handedness
     };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function joinWaitlist_(request) {
+  const lock = LockService.getScriptLock();
+
+  if (!lock.tryLock(10000)) {
+    fail_("BUSY", "Sheet is busy; please try again");
+  }
+
+  try {
+    const ctx = sheetContext_();
+    const participant = findParticipantInContext_(ctx, request.phone);
+
+    if (!participant) {
+      fail_("NOT_FOUND", "Phone number not found");
+    }
+
+    if (participant.status === "COMPLETED") {
+      fail_("COMPLETED", "Participant already completed the study");
+    }
+
+    if (participant.status === "BOOKED" && participant.polyuTime) {
+      return {
+        waitlisted: false,
+        booked: true,
+        appointment: appointmentFromParticipant_(participant)
+      };
+    }
+
+    if (participant.status !== "WAITLIST") {
+      setByHeader_(ctx.sheet, participant.row, ctx.map, "Status", "WAITLIST");
+      setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby preferences", "ANY");
+      setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby timestamp", new Date());
+      setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby information acknowledged", "YES");
+      SpreadsheetApp.flush();
+    }
+
+    return { waitlisted: true };
   } finally {
     lock.releaseLock();
   }
@@ -194,14 +238,9 @@ function bookReplacement_(request) {
       fail_("TARGET_NOT_FOUND", "Replacement row was not found");
     }
 
-    const currentTarget = participantFromRow_(target.row, target.values, ctx.map);
-    const currentTargetPhone = normalizePhone_(currentTarget.phone);
+    const targetName = String(get_(target.values, ctx.map, "Name") || "").trim();
 
-    const slotStillOpen =
-      currentTargetPhone === slot.originalPhone ||
-      currentTargetPhone === phone;
-
-    if (!slotStillOpen) {
+    if (targetName) {
       setWaitlist_(ctx, participant.row, slotId, slot);
       SpreadsheetApp.flush();
 
@@ -226,6 +265,19 @@ function bookReplacement_(request) {
   } finally {
     lock.releaseLock();
   }
+}
+
+function getOpenSlotIds_(ctx) {
+  return Object.keys(REPLACEMENT_SLOTS).filter(function(slotId) {
+    const slot = REPLACEMENT_SLOTS[slotId];
+    const target = findRowByHeaderValue_(ctx, "Patient_ID_TM", slot.targetPatientId);
+
+    if (!target) {
+      return false;
+    }
+
+    return !String(get_(target.values, ctx.map, "Name") || "").trim();
+  });
 }
 
 function moveParticipantIntoReplacementRow_(ctx, participant, targetRow, slot) {
@@ -628,5 +680,5 @@ function sanityCheck() {
     throw new Error("Missing headers: " + missing.join(", "));
   }
 
-  return "PASS: replacement booking backend ready";
+  return "PASS: availability is based on blank target-row Name";
 }
