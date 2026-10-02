@@ -128,108 +128,38 @@ const state={lang:"zh",phone:"",participant:null};
 const app=document.querySelector("#app");
 const tr=key=>T[state.lang][key];
 
-function esc(value=""){
-  const el=document.createElement("span");
-  el.textContent=value==null?"":String(value);
-  return el.innerHTML;
-}
-
-function safeUrl(value){
-  try{
-    const u=new URL(value,location.href);
-    return ["http:","https:"].includes(u.protocol)?u.href:"";
-  }catch{return"";}
-}
-
-function splitSlot(value){
-  const text=String(value||"").trim();
-  const m=text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(.+)$/);
-  return m?{date:`${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`,time:m[4]}:{date:"",time:text};
-}
-
-function dateLabel(value){
-  const p=splitSlot(value);
-  if(!p.date) return "";
-  const [y,m,d]=p.date.split("-");
-  return state.lang==="zh"?`${y} 年 ${Number(m)} 月 ${Number(d)} 日`:new Date(`${p.date}T00:00:00`).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
-}
-
-function startMinutes(value){
-  const m=splitSlot(value).time.match(/(\d{1,2}):(\d{2})/);
-  return m?Number(m[1])*60+Number(m[2]):null;
-}
-
-function arrivalTime(value){
-  const mins=startMinutes(value);
-  if(mins==null)return"";
-  const x=(mins-30+1440)%1440;
-  return `${String(Math.floor(x/60)).padStart(2,"0")}:${String(x%60).padStart(2,"0")}`;
-}
-
-function orderLabel(order){
-  return order==="POLYU_FIRST"?tr("polyuFirst"):order==="TMH_FIRST"?tr("tmhFirst"):"—";
-}
+function esc(value=""){const el=document.createElement("span");el.textContent=value==null?"":String(value);return el.innerHTML;}
+function safeUrl(value){try{const u=new URL(value,location.href);return ["http:","https:"].includes(u.protocol)?u.href:"";}catch{return"";}}
+function splitSlot(value){const text=String(value||"").trim();const m=text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(.+)$/);return m?{date:`${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`,time:m[4]}:{date:"",time:text};}
+function dateLabel(value){const p=splitSlot(value);if(!p.date)return"";const [y,m,d]=p.date.split("-");return state.lang==="zh"?`${y} 年 ${Number(m)} 月 ${Number(d)} 日`:new Date(`${p.date}T00:00:00`).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});}
+function startMinutes(value){const m=splitSlot(value).time.match(/(\d{1,2}):(\d{2})/);return m?Number(m[1])*60+Number(m[2]):null;}
+function arrivalTime(value){const mins=startMinutes(value);if(mins==null)return"";const x=(mins-30+1440)%1440;return `${String(Math.floor(x/60)).padStart(2,"0")}:${String(x%60).padStart(2,"0")}`;}
+function orderLabel(order){return order==="POLYU_FIRST"?tr("polyuFirst"):order==="TMH_FIRST"?tr("tmhFirst"):"—";}
 
 function api(payload){
-  return fetch(ASL_CONFIG.WEB_APP_URL,{
-    method:"POST",
-    headers:{"Content-Type":"text/plain;charset=utf-8"},
-    body:JSON.stringify(payload)
-  }).then(r=>r.json()).then(r=>{
-    if(!r.ok) throw Object.assign(new Error(r.message||"API error"),{code:r.code});
-    return r;
-  });
+  return fetch(ASL_CONFIG.WEB_APP_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)})
+    .then(r=>r.json()).then(r=>{if(!r.ok)throw Object.assign(new Error(r.message||"API error"),{code:r.code});return r;});
 }
 
-function translatePage(){
-  document.documentElement.lang=state.lang==="zh"?"zh-Hant":"en";
-  document.querySelectorAll("[data-text]").forEach(el=>el.textContent=tr(el.dataset.text));
-  document.querySelector("#language").textContent=state.lang==="zh"?"English":"中文";
-}
+function translatePage(){document.documentElement.lang=state.lang==="zh"?"zh-Hant":"en";document.querySelectorAll("[data-text]").forEach(el=>el.textContent=tr(el.dataset.text));document.querySelector("#language").textContent=state.lang==="zh"?"English":"中文";}
 
 function renderPhone(error=""){
   document.querySelector("#progress").textContent="";
-  app.innerHTML=`
-    <h2>${tr("phoneTitle")}</h2>
-    <p class="muted">${tr("phoneHelp")}</p>
-    ${error?`<p class="error">${esc(error)}</p>`:""}
-    <form id="phone-form">
-      <label>${tr("phone")}</label>
-      <div class="phone">
-        <select id="country">
-          <option value="+852">+852 Hong Kong</option>
-          <option value="+86">+86 Mainland China</option>
-        </select>
-        <input id="phone" type="tel" inputmode="tel" autocomplete="tel" required>
-      </div>
-      <button type="submit">${tr("continue")}</button>
-    </form>`;
+  app.innerHTML=`<h2>${tr("phoneTitle")}</h2><p class="muted">${tr("phoneHelp")}</p>${error?`<p class="error">${esc(error)}</p>`:""}<form id="phone-form"><label>${tr("phone")}</label><div class="phone"><select id="country"><option value="+852">+852 Hong Kong</option><option value="+86">+86 Mainland China</option></select><input id="phone" type="tel" inputmode="tel" autocomplete="tel" required></div><button type="submit">${tr("continue")}</button></form>`;
   document.querySelector("#phone-form").onsubmit=lookup;
 }
 
 async function lookup(event){
   event.preventDefault();
-  const btn=event.currentTarget.querySelector("button");
-  btn.disabled=true;
-  btn.textContent=tr("finding");
+  const btn=event.currentTarget.querySelector("button");btn.disabled=true;btn.textContent=tr("finding");
   state.phone=document.querySelector("#country").value+document.querySelector("#phone").value.replace(/\s+/g,"");
-  try{
-    const r=await api({action:"lookup",phone:state.phone});
-    state.participant=r.participant;
-    renderPortal();
-  }catch(e){
-    renderPhone(e.code==="NOT_FOUND"?tr("notFound"):tr("error"));
-  }
+  try{const r=await api({action:"lookup",phone:state.phone});state.participant=r.participant;renderPortal();}
+  catch(e){renderPhone(e.code==="NOT_FOUND"?tr("notFound"):tr("error"));}
 }
 
 function scanCard(title,value,extra,cls=""){
   const p=splitSlot(value);
-  return `<div class="appointment ${cls}">
-    <span>${title}</span>
-    <strong>${esc(dateLabel(value))}<br>${esc(p.time)}</strong>
-    <div class="arrival"><b>${tr("arrive")}：${esc(arrivalTime(value))}</b><small>${tr("arriveNote")}</small></div>
-    ${extra?`<p class="muted compact">${extra}</p>`:""}
-  </div>`;
+  return `<div class="appointment ${cls}"><span>${title}</span><strong>${esc(dateLabel(value))}<br>${esc(p.time)}</strong><div class="arrival"><b>${tr("arrive")}：${esc(arrivalTime(value))}</b><small>${tr("arriveNote")}</small></div>${extra?`<p class="muted compact">${extra}</p>`:""}</div>`;
 }
 
 function renderPortal(){
@@ -238,10 +168,7 @@ function renderPortal(){
   if(!p)return renderPhone();
 
   if(!p.appointment){
-    app.innerHTML=`
-      <h2>${tr("hello")}, ${esc(p.name)}</h2>
-      <div class="important">${p.status==="WAITLIST"?tr("waitlist"):tr("closed")}</div>
-      ${contactButtons()}`;
+    app.innerHTML=`<h2>${tr("hello")}, ${esc(p.name)}</h2><div class="important">${p.status==="WAITLIST"?tr("waitlist"):tr("closed")}</div>${contactButtons()}`;
     return;
   }
 
@@ -254,118 +181,35 @@ function renderPortal(){
   app.innerHTML=`
     <h2>${tr("hello")}, ${esc(p.name)}</h2>
     ${a.polyuCompleted&&a.tmhCompleted?`<p class="success"><strong>${tr("completed")}</strong></p>`:""}
-
-    <section>
-      <h3>${tr("schedule")}</h3>
-      <p class="muted"><strong>${tr("order")}：</strong>${orderLabel(a.order)}</p>
-      ${cards}
-      <div class="important">${tr("contact")}</div>
-    </section>
-
-    <section class="panel">
-      <h3>${tr("guides")}</h3>
-      <div class="link-grid">
-        ${fileLink(FILES.polyuGuide,tr("polyuGuide"))}
-        ${fileLink(FILES.tmhGuide,tr("tmhGuide"))}
-      </div>
-    </section>
-
-    <section class="panel">
-      <h3>${tr("preparation")}</h3>
-      <ul>${tr("prepItems").map(x=>`<li>${x}</li>`).join("")}</ul>
-    </section>
-
+    <section><h3>${tr("schedule")}</h3><p class="muted"><strong>${tr("order")}：</strong>${orderLabel(a.order)}</p>${cards}<div class="important">${tr("contact")}</div></section>
+    <section class="panel"><h3>${tr("guides")}</h3><div class="link-grid">${fileLink(FILES.polyuGuide,tr("polyuGuide"))}${fileLink(FILES.tmhGuide,tr("tmhGuide"))}</div></section>
+    <section class="panel"><h3>${tr("preparation")}</h3><ul>${tr("prepItems").map(x=>`<li>${x}</li>`).join("")}</ul></section>
     ${profileSection(p)}
-
-    <section class="panel">
-      <h3>${tr("docs")}</h3>
-      <p>${tr("infoText")}</p>
-      ${fileLink(FILES.info,tr("infoButton"))}
-      <label class="check-row">
-        <input id="read-info" type="checkbox">
-        <span>${tr("readAck")}</span>
-      </label>
-      <p>${tr("consentText")}</p>
-      <a id="consent-link" class="button-link disabled-link" href="${FILES.consent}" target="_blank" rel="noopener" aria-disabled="true">${tr("consentButton")}</a>
-      <small id="consent-help" class="muted block">${tr("consentLocked")}</small>
-      <p class="important compact">${tr("returnText")}</p>
-    </section>
-
-    ${a.qr?`<section class="panel qr">
-      <h3>${tr("qr")}</h3>
-      <img src="${esc(safeUrl(a.qr))}" alt="Campus entry QR code">
-      <a class="button-link" href="${esc(safeUrl(a.qr))}" target="_blank" rel="noopener">${tr("qrSave")}</a>
-    </section>`:""}
-
-    <section class="panel">
-      <h3>${tr("change")}</h3>
-      <p>${tr("changeText")}</p>
-      ${contactButtons()}
-    </section>`;
+    <section class="panel"><h3>${tr("docs")}</h3><p>${tr("infoText")}</p>${fileLink(FILES.info,tr("infoButton"))}<label class="check-row"><input id="read-info" type="checkbox"><span>${tr("readAck")}</span></label><p>${tr("consentText")}</p><a id="consent-link" class="button-link disabled-link" href="${FILES.consent}" target="_blank" rel="noopener" aria-disabled="true">${tr("consentButton")}</a><small id="consent-help" class="muted block">${tr("consentLocked")}</small><p class="important compact">${tr("returnText")}</p></section>
+    ${a.qr?`<section class="panel qr"><h3>${tr("qr")}</h3><img src="${esc(safeUrl(a.qr))}" alt="Campus entry QR code"><a class="button-link" href="${esc(safeUrl(a.qr))}" target="_blank" rel="noopener">${tr("qrSave")}</a></section>`:""}
+    <section class="panel"><h3>${tr("change")}</h3><p>${tr("changeText")}</p>${contactButtons()}</section>`;
 
   const check=document.querySelector("#read-info");
   const consent=document.querySelector("#consent-link");
   const help=document.querySelector("#consent-help");
-  check.onchange=()=>{
-    consent.classList.toggle("disabled-link",!check.checked);
-    consent.setAttribute("aria-disabled",String(!check.checked));
-    help.hidden=check.checked;
-  };
+  check.onchange=()=>{consent.classList.toggle("disabled-link",!check.checked);consent.setAttribute("aria-disabled",String(!check.checked));help.hidden=check.checked;};
   consent.onclick=e=>{if(!check.checked)e.preventDefault();};
   document.querySelector("#profile-form")?.addEventListener("submit",saveProfile);
 }
 
-function fileLink(href,label){
-  return `<a class="file-link" href="${href}" target="_blank" rel="noopener"><strong>${label}</strong><span>${tr("openPdf")}</span></a>`;
-}
-
-function contactButtons(){
-  return `<div class="actions contact-actions">
-    <a class="button-link" href="tel:+85291230084">📞 91230084</a>
-    <a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp</a>
-  </div>`;
-}
-
-function profileSection(p){
-  return `<section class="panel">
-    <h3>${tr("extra")}</h3>
-    <p class="muted">${tr("extraHelp")}</p>
-    <form id="profile-form" class="profile-grid">
-      <label>${tr("height")}<input id="height" type="number" min="100" max="250" step="0.1" value="${esc(p.height||"")}" required></label>
-      <label>${tr("weight")}<input id="weight" type="number" min="20" max="300" step="0.1" value="${esc(p.weight||"")}" required></label>
-      <button id="profile-save" type="submit">${tr("save")}</button>
-      <span id="profile-status" class="success"></span>
-    </form>
-  </section>`;
-}
+function fileLink(href,label){return `<a class="file-link" href="${href}" target="_blank" rel="noopener"><strong>${label}</strong><span>${tr("openPdf")}</span></a>`;}
+function contactButtons(){return `<div class="actions contact-actions"><a class="button-link" href="tel:+85291230084">📞 91230084</a><a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp</a></div>`;}
+function profileSection(p){return `<section class="panel"><h3>${tr("extra")}</h3><p class="muted">${tr("extraHelp")}</p><form id="profile-form" class="profile-grid"><label>${tr("height")}<input id="height" type="number" min="100" max="250" step="0.1" value="${esc(p.height||"")}" required></label><label>${tr("weight")}<input id="weight" type="number" min="20" max="300" step="0.1" value="${esc(p.weight||"")}" required></label><button id="profile-save" type="submit">${tr("save")}</button><span id="profile-status" class="success"></span></form></section>`;}
 
 async function saveProfile(event){
   event.preventDefault();
-  const btn=document.querySelector("#profile-save");
-  const status=document.querySelector("#profile-status");
-  btn.disabled=true;
-  btn.textContent=tr("saving");
-  status.textContent="";
-  try{
-    const height=document.querySelector("#height").value;
-    const weight=document.querySelector("#weight").value;
-    await api({action:"updateProfile",phone:state.phone,height,weight});
-    state.participant.height=height;
-    state.participant.weight=weight;
-    btn.textContent=tr("save");
-    status.textContent=tr("saved");
-  }catch{
-    status.textContent=tr("error");
-  }finally{
-    btn.disabled=false;
-  }
+  const btn=document.querySelector("#profile-save"),status=document.querySelector("#profile-status");
+  btn.disabled=true;btn.textContent=tr("saving");status.textContent="";
+  try{const height=document.querySelector("#height").value,weight=document.querySelector("#weight").value;await api({action:"updateProfile",phone:state.phone,height,weight});state.participant.height=height;state.participant.weight=weight;btn.textContent=tr("save");status.textContent=tr("saved");}
+  catch{status.textContent=tr("error");}
+  finally{btn.disabled=false;}
 }
 
-document.querySelector("#language").onclick=()=>{
-  state.lang=state.lang==="zh"?"en":"zh";
-  translatePage();
-  state.participant?renderPortal():renderPhone();
-};
-
+document.querySelector("#language").onclick=()=>{state.lang=state.lang==="zh"?"en":"zh";translatePage();state.participant?renderPortal():renderPhone();};
 translatePage();
 renderPhone();
