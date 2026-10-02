@@ -99,7 +99,7 @@ function standbySignup_(request) {
     put("height", height);
     put("handedness", handedness);
     put("Phone", phone.replace(/^\+852/,"").replace(/^\+/,""));
-    put("Status", "STANDBY_1004");
+    put("Status", "INVITED");
     put("Standby preferences", preferences.map(x => x + ": " + STANDBY_SLOTS[x]).join(" | "));
     put("Standby timestamp", new Date());
     put("Standby information acknowledged", "YES");
@@ -153,7 +153,7 @@ function standbySelect_(request) {
       }
     }
 
-    setByHeader_(ctx.sheet, participant.row, ctx.map, "Status", taken ? "WAITLIST" : "STANDBY_1004");
+    setByHeader_(ctx.sheet, participant.row, ctx.map, "Status", taken ? "WAITLIST" : "INVITED");
     setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby preferences", slotId + ": " + STANDBY_SLOTS[slotId]);
     setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby timestamp", new Date());
     setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby information acknowledged", "YES");
@@ -368,5 +368,5 @@ function sanityCheck() {
   const missing = REQUIRED_HEADERS.filter(h => ctx.map[String(h).trim()] == null);
   if (missing.length) throw new Error("Missing headers: " + missing.join(", "));
   ensureHeaders_(ctx.sheet, STANDBY_HEADERS);
-  return "PASS: header-based portal + 10/4 standby signup ready";
+  return "PASS: header-based portal + standby signup ready";
 }
