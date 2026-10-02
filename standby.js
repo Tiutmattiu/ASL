@@ -276,6 +276,22 @@ async function lookup(e){
   try{
     const r=await api({action:"lookup",phone:state.phone});
     state.participant=r.participant;
+
+    if(!state.participant.appointment && state.participant.standbyPreference){
+      const savedSlot=String(state.participant.standbyPreference).split(":")[0].trim();
+      if(PLAN[savedSlot]){
+        state.slotId=savedSlot;
+        if(state.participant.status==="WAITLIST"){
+          renderWaitlist();
+          return;
+        }
+        if(state.participant.status==="INVITED"){
+          renderFinal();
+          return;
+        }
+      }
+    }
+
     if(state.participant.appointment){
       app.innerHTML=`
         <h2>${esc(state.participant.name)}</h2>
