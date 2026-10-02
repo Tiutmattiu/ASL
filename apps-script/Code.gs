@@ -35,7 +35,6 @@ const REQUIRED_HEADERS = [
 const REPLACEMENT_SLOTS = {
   B: {
     targetPatientId: "20261004013",
-    originalPhone: "+85265677735",
     polyuTime: "2026-10-04 13:00–13:30",
     tmhTime: "2026-10-04 15:00–15:30",
     order: "POLYU_FIRST",
@@ -45,7 +44,6 @@ const REPLACEMENT_SLOTS = {
   },
   D: {
     targetPatientId: "20261004010",
-    originalPhone: "+85252641868",
     polyuTime: "2026-10-04 16:30–17:00",
     tmhTime: "2026-10-04 13:30–14:00",
     order: "TMH_FIRST",
@@ -62,7 +60,7 @@ function doPost(e) {
       lookup: lookup_,
       updateProfile: updateProfile_,
       bookReplacement: bookReplacement_,
-      joinWaitlist: joinWaitlist_
+      recordPreference: recordPreference_
     };
 
     if (!handlers[request.action]) {
@@ -106,7 +104,7 @@ function updateProfile_(request) {
     fail_("BAD_WEIGHT", "Invalid weight");
   }
 
-  if (handednessInput && !["R", "L"].includes(handednessInput)) {
+  if (!["R", "L"].includes(handednessInput)) {
     fail_("BAD_HANDEDNESS", "Handedness must be R or L");
   }
 
@@ -128,23 +126,27 @@ function updateProfile_(request) {
     setByHeader_(ctx.sheet, participant.row, ctx.map, "height", height);
     setByHeader_(ctx.sheet, participant.row, ctx.map, "weight", weight);
 
-    if (handednessInput) {
-      setByHeader_(ctx.sheet, participant.row, ctx.map, "handedness", handednessInput);
-    }
+    setByHeader_(ctx.sheet, participant.row, ctx.map, "handedness", handednessInput);
 
     SpreadsheetApp.flush();
 
     return {
       height: height,
       weight: weight,
-      handedness: handednessInput || participant.handedness
+      handedness: handednessInput
     };
   } finally {
     lock.releaseLock();
   }
 }
 
-function joinWaitlist_(request) {
+function recordPreference_(request) {
+  const preference = String(request.preference || "").trim().toUpperCase();
+
+  if (!["OCT10", "NONE"].includes(preference)) {
+    fail_("BAD_PREFERENCE", "Invalid preference");
+  }
+
   const lock = LockService.getScriptLock();
 
   if (!lock.tryLock(10000)) {
@@ -165,21 +167,37 @@ function joinWaitlist_(request) {
 
     if (participant.status === "BOOKED" && participant.polyuTime) {
       return {
-        waitlisted: false,
         booked: true,
         appointment: appointmentFromParticipant_(participant)
       };
     }
 
-    if (participant.status !== "WAITLIST") {
+    if (preference === "OCT10") {
       setByHeader_(ctx.sheet, participant.row, ctx.map, "Status", "WAITLIST");
-      setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby preferences", "ANY");
+      setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby preferences", "OCT10: 2026-10-10");
       setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby timestamp", new Date());
       setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby information acknowledged", "YES");
       SpreadsheetApp.flush();
+
+      return {
+        booked: false,
+        waitlisted: true,
+        preference: "OCT10: 2026-10-10"
+      };
     }
 
-    return { waitlisted: true };
+    setByHeader_(ctx.sheet, participant.row, ctx.map, "Status", "");
+    setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby preferences", "NONE: current dates unavailable");
+    setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby timestamp", new Date());
+    setByHeader_(ctx.sheet, participant.row, ctx.map, "Standby information acknowledged", "YES");
+    SpreadsheetApp.flush();
+
+    return {
+      booked: false,
+      waitlisted: false,
+      unavailable: true,
+      preference: "NONE: current dates unavailable"
+    };
   } finally {
     lock.releaseLock();
   }
@@ -680,5 +698,5 @@ function sanityCheck() {
     throw new Error("Missing headers: " + missing.join(", "));
   }
 
-  return "PASS: availability is based on blank target-row Name";
+  return "PASS: blank Name means open; OCT10 waitlist and NONE preference enabled";
 }
