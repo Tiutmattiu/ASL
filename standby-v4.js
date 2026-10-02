@@ -24,7 +24,7 @@ const PLAN = {
 
 const NOTICES = {
   zh: [
-    `請先閱讀完整的<strong>《參加者須知》</strong>。你也可以先閱讀同意書。<br><br><strong>MRI 意外發現是什麼？</strong><br>MRI 意外發現是指研究掃描中偶然發現可能需要進一步醫療評估的異常，例如疑似<strong>腦出血、中風、腫瘤</strong>或其他明顯異常。研究 MRI 並不是正式的臨床診斷檢查，也不會提供常規影像報告。<br><br>如果你在同意書中勾選<strong>「希望得到通知」</strong>：若研究人員在影像中發現上述可能具有臨床意義的異常，我們會在發現後聯絡你。<br><br>如果你勾選<strong>「不希望得到通知」</strong>：即使研究影像中發現可能的異常，我們也不會因本研究的影像結果主動通知你。<br><br>如果之後正式確認參加，請在同意書中選擇其中一項，並填寫姓名、簽署及日期。<div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">參加者須知</a><a class="button-link secondary-link" href="${FILES.consent}" target="_blank" rel="noopener">同意書</a></div>`,
+    `請先閱讀完整的<strong>《參加者須知》</strong>.然後閱讀同意書。<br><br><strong>MRI 意外發現是什麼？</strong><br>MRI 意外發現是指研究掃描中偶然發現可能需要進一步醫療評估的異常，例如疑似<strong>腦出血、中風、腫瘤</strong>或其他明顯異常。研究 MRI 並不是正式的臨床診斷檢查，也不會提供常規影像報告。<br><br>如果你在同意書中勾選<strong>「希望得到通知」</strong>：若研究人員在影像中發現上述可能具有臨床意義的異常，我們會在發現後聯絡你。<br><br>如果你勾選<strong>「不希望得到通知」</strong>：即使研究影像中發現可能的異常，我們也不會因本研究的影像結果主動通知你。<br><br>如果之後正式確認參加，請在同意書中選擇其中一項，並填寫姓名、簽署及日期。<div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">參加者須知</a><a class="button-link secondary-link" href="${FILES.consent}" target="_blank" rel="noopener">同意書</a></div>`,
     "你需要在<strong>同一天</strong>完成香港理工大學及屯門醫院兩次 MRI 掃描。",
     "香港理工大學及屯門醫院的<strong>掃描時間均為固定時間</strong>；系統會按照你選擇的理工時段自動配對另一個地點的時間及掃描次序。",
     "兩個地點都建議在<strong>掃描時間前約 30 分鐘到達</strong>。",
