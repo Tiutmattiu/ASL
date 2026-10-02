@@ -9,10 +9,22 @@ const REQUIRED_HEADERS = [
   "Incentive site","Incentive paid","Campus QR","weight","height"
 ];
 
+const STANDBY_HEADERS = ["Standby preferences","Standby timestamp"];
+
+const STANDBY_SLOTS = {
+  "A": "屯門醫院 10:30–11:00 → 香港理工大學 12:30–13:00",
+  "B": "香港理工大學 13:00–13:30 → 屯門醫院 15:00–15:30",
+  "C": "屯門醫院 13:00–13:30 → 香港理工大學 16:00–16:30",
+  "D": "屯門醫院 13:30–14:00 → 香港理工大學 16:30–17:00",
+  "E": "屯門醫院 14:00–14:30 → 香港理工大學 17:00–17:30",
+  "F": "屯門醫院 14:30–15:00 → 香港理工大學 17:30–18:00",
+  "G": "屯門醫院 15:30–16:00 → 香港理工大學 18:00–18:30"
+};
+
 function doPost(e) {
   try {
     const request = JSON.parse(e.postData.contents || "{}");
-    const handlers = { lookup: lookup_, updateProfile: updateProfile_ };
+    const handlers = { lookup: lookup_, updateProfile: updateProfile_, standbySignup: standbySignup_ };
     if (!handlers[request.action]) fail_("BAD_REQUEST","Unknown action");
     return json_(Object.assign({ok:true}, handlers[request.action](request)));
   } catch (error) {
@@ -45,6 +57,74 @@ function updateProfile_(request) {
   } finally {
     lock.releaseLock();
   }
+}
+
+function standbySignup_(request) {
+  const name = String(request.name || "").trim();
+  const gender = String(request.gender || "").trim().toUpperCase();
+  const age = number_(request.age);
+  const height = number_(request.height);
+  const weight = number_(request.weight);
+  const handedness = String(request.handedness || "").trim().toUpperCase();
+  const phone = normalizePhone_(request.phone);
+  const preferences = Array.isArray(request.preferences) ? [...new Set(request.preferences.map(String))] : [];
+
+  if (!name) fail_("BAD_NAME","Name is required");
+  if (!phone) fail_("BAD_PHONE","Valid phone number is required");
+  if (!["F","M","OTHER"].includes(gender)) fail_("BAD_GENDER","Invalid gender");
+  if (!(age >= 18 && age <= 40)) fail_("BAD_AGE","Age must be 18–40");
+  if (!(height >= 100 && height <= 250)) fail_("BAD_HEIGHT","Invalid height");
+  if (!(weight >= 20 && weight <= 300)) fail_("BAD_WEIGHT","Invalid weight");
+  if (!["R","L"].includes(handedness)) fail_("BAD_HANDEDNESS","Invalid handedness");
+  if (!preferences.length || preferences.some(x => !STANDBY_SLOTS[x])) fail_("BAD_PREFERENCES","Select at least one valid standby schedule");
+  if (request.eligible !== true) fail_("NOT_ELIGIBLE_ACK","Eligibility confirmation is required");
+
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) fail_("BUSY","Sheet is busy; please try again");
+  try {
+    const existing = findParticipant_(phone);
+    if (existing) fail_("ALREADY_REGISTERED","This phone number is already in the study list");
+
+    let ctx = sheetContext_();
+    ensureHeaders_(ctx.sheet, STANDBY_HEADERS);
+    ctx = sheetContext_();
+
+    const row = ctx.sheet.getLastRow() + 1;
+    const values = new Array(ctx.sheet.getLastColumn()).fill("");
+    const put = (header,value) => {
+      const i = ctx.map[String(header).trim()];
+      if (i != null) values[i] = value;
+    };
+
+    put("Name", name);
+    put("Gender", gender === "OTHER" ? "Other" : gender);
+    put("Age", age);
+    put("weight", weight);
+    put("height", height);
+    put("handedness", handedness);
+    put("Phone", phone.replace(/^\+852/,"").replace(/^\+86/,""));
+    put("Status", "STANDBY_1004");
+    put("Standby preferences", preferences.map(x => x + ": " + STANDBY_SLOTS[x]).join(" | "));
+    put("Standby timestamp", new Date());
+
+    ctx.sheet.getRange(row,1,1,values.length).setValues([values]);
+    SpreadsheetApp.flush();
+    return { standby:true };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function ensureHeaders_(sheet, headers) {
+  const lastColumn = Math.max(sheet.getLastColumn(),1);
+  const existing = sheet.getRange(1,1,1,lastColumn).getDisplayValues()[0].map(x => String(x || "").trim());
+  let next = existing.length + 1;
+  headers.forEach(header => {
+    if (!existing.includes(header)) {
+      sheet.getRange(1,next++).setValue(header);
+      existing.push(header);
+    }
+  });
 }
 
 function sheetContext_() {
@@ -233,5 +313,6 @@ function sanityCheck() {
   const ctx = sheetContext_();
   const missing = REQUIRED_HEADERS.filter(h => ctx.map[String(h).trim()] == null);
   if (missing.length) throw new Error("Missing headers: " + missing.join(", "));
-  return "PASS: header-based lookup/update ready; no fixed column positions";
+  ensureHeaders_(ctx.sheet, STANDBY_HEADERS);
+  return "PASS: header-based portal + 10/4 standby signup ready";
 }
