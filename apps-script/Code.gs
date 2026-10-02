@@ -13,7 +13,8 @@ const STANDBY_HEADERS = ["Standby preferences","Standby timestamp","Standby info
 
 const STANDBY_SLOTS = {
   "B": "香港理工大學 13:00–13:30 → 屯門醫院 15:00–15:30",
-  "D": "屯門醫院 13:30–14:00 → 香港理工大學 16:30–17:00"
+  "D": "屯門醫院 13:30–14:00 → 香港理工大學 16:30–17:00",
+  "H": "屯門醫院 12:00–12:30 → 香港理工大學 14:30–15:00（2026-10-10）"
 };
 
 function doPost(e) {
