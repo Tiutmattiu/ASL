@@ -104,7 +104,6 @@ const T = {
     docs:"研究文件",
     qr:"PolyU 校園入場二維碼",
     qrSave:"查看／儲存二維碼",
-    alreadyBooked:"你已經有正式掃描預約。",
     completed:"你已完成本研究，謝謝參與。"
   },
   en:{
@@ -123,7 +122,7 @@ const T = {
     understand:"I understand",
     understood:"Understood ✓",
     choose:"Choose one scan arrangement",
-    chooseHelp:"Both options are fixed paired arrangements. If the arrangement is available, your booking is confirmed immediately. If it has already been booked, you will be added to the waitlist.",
+    chooseHelp:"Both options are fixed paired arrangements. If available, your booking is confirmed immediately. If it has already been booked, you will be added to the waitlist.",
     back:"Back",
     book:"Confirm booking",
     booking:"Processing…",
@@ -157,330 +156,98 @@ const T = {
     docs:"Study documents",
     qr:"PolyU campus entry QR code",
     qrSave:"View / save QR code",
-    alreadyBooked:"You already have a confirmed scan booking.",
     completed:"You have completed the study. Thank you."
   }
 };
 
-const state = {lang:"zh",step:"phone",phone:"",participant:null,noticesDone:0,slotId:""};
-const app = document.querySelector("#app");
-const tr = key => T[state.lang][key];
+const state={lang:"zh",step:"phone",phone:"",participant:null,noticesDone:0,slotId:""};
+const app=document.querySelector("#app");
+const tr=key=>T[state.lang][key];
 
-function esc(value=""){
-  const el=document.createElement("span");
-  el.textContent=value==null?"":String(value);
-  return el.innerHTML;
-}
-
-function setProgress(n){
-  document.querySelector("#progress").textContent=n ? `${tr("step")} ${n} / 4` : "";
-}
-
-function translatePage(){
-  document.documentElement.lang=state.lang==="zh"?"zh-Hant":"en";
-  document.querySelectorAll("[data-text]").forEach(el=>el.textContent=tr(el.dataset.text));
-  document.querySelector("#language").textContent=state.lang==="zh"?"English":"中文";
-}
-
-function splitSlot(value){
-  const text=String(value||"").trim();
-  const i=text.indexOf(" ");
-  return i<0?{date:"",time:text}:{date:text.slice(0,i),time:text.slice(i+1)};
-}
-
-function dateLabel(value){
-  const d=splitSlot(value).date;
-  if(d==="2026-10-04") return state.lang==="zh"?"2026 年 10 月 4 日":"4 October 2026";
-  return d;
-}
-
-function arrivalTime(value){
-  const m=splitSlot(value).time.match(/(\d{1,2}):(\d{2})/);
-  if(!m) return "";
-  const total=(Number(m[1])*60+Number(m[2])-30+1440)%1440;
-  return String(Math.floor(total/60)).padStart(2,"0")+":"+String(total%60).padStart(2,"0");
-}
-
-function orderLabel(order){
-  if(state.lang==="zh") return order==="POLYU_FIRST"?"香港理工大學 → 屯門醫院":"屯門醫院 → 香港理工大學";
-  return order==="POLYU_FIRST"?"PolyU → Tuen Mun Hospital":"Tuen Mun Hospital → PolyU";
-}
-
-function planFromPreference(pref){
-  const id=String(pref||"").split(":")[0].trim();
-  return PLAN[id] ? {id,...PLAN[id]} : null;
-}
+function esc(value=""){const el=document.createElement("span");el.textContent=value==null?"":String(value);return el.innerHTML;}
+function setProgress(n){document.querySelector("#progress").textContent=n?`${tr("step")} ${n} / 4`:"";}
+function translatePage(){document.documentElement.lang=state.lang==="zh"?"zh-Hant":"en";document.querySelectorAll("[data-text]").forEach(el=>el.textContent=tr(el.dataset.text));document.querySelector("#language").textContent=state.lang==="zh"?"English":"中文";}
+function splitSlot(value){const text=String(value||"").trim();const i=text.indexOf(" ");return i<0?{date:"",time:text}:{date:text.slice(0,i),time:text.slice(i+1)};}
+function dateLabel(value){const d=splitSlot(value).date;return d==="2026-10-04"?(state.lang==="zh"?"2026 年 10 月 4 日":"4 October 2026"):d;}
+function arrivalTime(value){const m=splitSlot(value).time.match(/(\d{1,2}):(\d{2})/);if(!m)return"";const t=(Number(m[1])*60+Number(m[2])-30+1440)%1440;return String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0");}
+function orderLabel(order){if(state.lang==="zh")return order==="POLYU_FIRST"?"香港理工大學 → 屯門醫院":"屯門醫院 → 香港理工大學";return order==="POLYU_FIRST"?"PolyU → Tuen Mun Hospital":"Tuen Mun Hospital → PolyU";}
+function planFromPreference(pref){const id=String(pref||"").split(":")[0].trim();return PLAN[id]?{id,...PLAN[id]}:null;}
 
 async function api(payload){
-  const response=await fetch(ASL_CONFIG.WEB_APP_URL,{
-    method:"POST",
-    headers:{"Content-Type":"text/plain;charset=utf-8"},
-    body:JSON.stringify(payload)
-  });
+  const response=await fetch(ASL_CONFIG.WEB_APP_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
   const result=await response.json();
-  if(!result.ok) throw Object.assign(new Error(result.message||"API error"),{code:result.code});
+  if(!result.ok)throw Object.assign(new Error(result.message||"API error"),{code:result.code});
   return result;
 }
 
 function renderPhone(error=""){
-  state.step="phone";
-  setProgress(1);
-  app.innerHTML=`
-    <h2>${tr("phoneTitle")}</h2>
-    <p class="muted">${tr("phoneHelp")}</p>
-    ${error?`<p class="error">${esc(error)}</p>`:""}
-    <form id="phone-form">
-      <label>${tr("phone")}</label>
-      <div class="phone">
-        <select id="country">
-          <option value="+852">+852 Hong Kong</option>
-          <option value="+86">+86 Mainland China</option>
-        </select>
-        <input id="phone" type="tel" inputmode="tel" autocomplete="tel" required>
-      </div>
-      <button type="submit">${tr("continue")}</button>
-    </form>`;
+  state.step="phone";setProgress(1);
+  app.innerHTML=`<h2>${tr("phoneTitle")}</h2><p class="muted">${tr("phoneHelp")}</p>${error?`<p class="error">${esc(error)}</p>`:""}<form id="phone-form"><label>${tr("phone")}</label><div class="phone"><select id="country"><option value="+852">+852 Hong Kong</option><option value="+86">+86 Mainland China</option></select><input id="phone" type="tel" inputmode="tel" autocomplete="tel" required></div><button type="submit">${tr("continue")}</button></form>`;
   document.querySelector("#phone-form").onsubmit=lookup;
 }
 
 async function lookup(e){
   e.preventDefault();
-  const btn=e.currentTarget.querySelector("button");
-  btn.disabled=true;
-  btn.textContent=tr("finding");
+  const btn=e.currentTarget.querySelector("button");btn.disabled=true;btn.textContent=tr("finding");
   state.phone=document.querySelector("#country").value+document.querySelector("#phone").value.replace(/\s+/g,"");
-
   try{
     const result=await api({action:"lookup",phone:state.phone});
     state.participant=result.participant;
-
-    if(state.participant.status==="COMPLETED"){
-      setProgress(1);
-      app.innerHTML=`<h2>${esc(state.participant.name)}</h2><div class="important">${tr("completed")}</div>`;
-      return;
-    }
-
-    if(state.participant.appointment){
-      renderBookedResult(state.participant.appointment);
-      return;
-    }
-
-    if(state.participant.status==="WAITLIST" && state.participant.waitlistPreference){
-      renderWaitlist(planFromPreference(state.participant.waitlistPreference));
-      return;
-    }
-
-    state.noticesDone=0;
-    renderNotices();
-  }catch(err){
-    renderPhone(err.code==="NOT_FOUND"?tr("notFound"):tr("error"));
-  }
+    if(state.participant.status==="COMPLETED"){setProgress(1);app.innerHTML=`<h2>${esc(state.participant.name)}</h2><div class="important">${tr("completed")}</div>`;return;}
+    if(state.participant.appointment){renderBookedResult(state.participant.appointment);return;}
+    if(state.participant.status==="WAITLIST"&&state.participant.waitlistPreference){renderWaitlist(planFromPreference(state.participant.waitlistPreference));return;}
+    state.noticesDone=0;renderNotices();
+  }catch(err){renderPhone(err.code==="NOT_FOUND"?tr("notFound"):tr("error"));}
 }
 
 function renderNotices(){
-  state.step="notices";
-  setProgress(2);
-  app.innerHTML=`
-    <div class="summary">
-      <div><strong>${tr("participant")}</strong><br>${esc(state.participant.name)}</div>
-    </div>
-    <h2 style="margin-top:22px">${tr("notices")}</h2>
-    <div id="notices"></div>`;
-
+  state.step="notices";setProgress(2);
+  app.innerHTML=`<div class="summary"><div><strong>${tr("participant")}</strong><br>${esc(state.participant.name)}</div></div><h2 style="margin-top:22px">${tr("notices")}</h2><div id="notices"></div>`;
   const list=document.querySelector("#notices");
-  NOTICES[state.lang].forEach((text,index)=>{
-    const done=index<state.noticesDone;
-    const unlocked=index<=state.noticesDone;
-    list.insertAdjacentHTML("beforeend",`
-      <div class="notice ${done?"done":unlocked?"":"locked"}">
-        <p>${text}</p>
-        <button type="button" data-notice="${index}" ${unlocked&&!done?"":"disabled"}>${done?tr("understood"):tr("understand")}</button>
-      </div>`);
-  });
-
-  if(state.noticesDone===NOTICES[state.lang].length){
-    list.insertAdjacentHTML("beforeend",`<div class="actions"><button id="to-slots">${tr("continue")}</button></div>`);
-  }
-
-  list.onclick=e=>{
-    if(e.target.hasAttribute("data-notice")){
-      state.noticesDone++;
-      renderNotices();
-    }
-  };
+  NOTICES[state.lang].forEach((text,index)=>{const done=index<state.noticesDone;const unlocked=index<=state.noticesDone;list.insertAdjacentHTML("beforeend",`<div class="notice ${done?"done":unlocked?"":"locked"}"><p>${text}</p><button type="button" data-notice="${index}" ${unlocked&&!done?"":"disabled"}>${done?tr("understood"):tr("understand")}</button></div>`);});
+  if(state.noticesDone===NOTICES[state.lang].length)list.insertAdjacentHTML("beforeend",`<div class="actions"><button id="to-slots">${tr("continue")}</button></div>`);
+  list.onclick=e=>{if(e.target.hasAttribute("data-notice")){state.noticesDone++;renderNotices();}};
   document.querySelector("#to-slots")?.addEventListener("click",renderSlots);
 }
 
 function renderSlots(message=""){
-  state.step="slots";
-  setProgress(3);
-  app.innerHTML=`
-    <h2>${tr("choose")}</h2>
-    <p class="muted">${tr("chooseHelp")}</p>
-    ${message?`<p class="error">${esc(message)}</p>`:""}
-    <div class="paired-choice-list">
-      ${Object.entries(PLAN).map(([id,p])=>`
-        <button class="choice paired-choice ${state.slotId===id?"selected":""}" type="button" data-slot="${id}">
-          <strong>${orderLabel(p.order)}</strong>
-          <span>${p.order==="POLYU_FIRST"
-            ? `理工 ${esc(splitSlot(p.polyuTime).time)}　→　屯門 ${esc(splitSlot(p.tmhTime).time)}`
-            : `屯門 ${esc(splitSlot(p.tmhTime).time)}　→　理工 ${esc(splitSlot(p.polyuTime).time)}`}</span>
-        </button>`).join("")}
-    </div>
-    <div class="actions">
-      <button class="secondary" id="back">${tr("back")}</button>
-      <button id="book">${tr("book")}</button>
-    </div>`;
-
-  app.querySelectorAll("[data-slot]").forEach(btn=>{
-    btn.onclick=()=>{
-      state.slotId=btn.dataset.slot;
-      renderSlots();
-    };
-  });
+  state.step="slots";setProgress(3);
+  app.innerHTML=`<h2>${tr("choose")}</h2><p class="muted">${tr("chooseHelp")}</p>${message?`<p class="error">${esc(message)}</p>`:""}<div class="paired-choice-list">${Object.entries(PLAN).map(([id,p])=>`<button class="choice paired-choice ${state.slotId===id?"selected":""}" type="button" data-slot="${id}"><strong>${orderLabel(p.order)}</strong><span>${p.order==="POLYU_FIRST"?`理工 ${esc(splitSlot(p.polyuTime).time)}　→　屯門 ${esc(splitSlot(p.tmhTime).time)}`:`屯門 ${esc(splitSlot(p.tmhTime).time)}　→　理工 ${esc(splitSlot(p.polyuTime).time)}`}</span></button>`).join("")}</div><div class="actions"><button class="secondary" id="back">${tr("back")}</button><button id="book">${tr("book")}</button></div>`;
+  app.querySelectorAll("[data-slot]").forEach(btn=>btn.onclick=()=>{state.slotId=btn.dataset.slot;renderSlots();});
   document.querySelector("#back").onclick=renderNotices;
   document.querySelector("#book").onclick=submitBooking;
 }
 
 async function submitBooking(e){
-  if(!state.slotId) return renderSlots(tr("needChoice"));
-  e.target.disabled=true;
-  e.target.textContent=tr("booking");
-
+  if(!state.slotId)return renderSlots(tr("needChoice"));
+  e.target.disabled=true;e.target.textContent=tr("booking");
   try{
-    const result=await api({
-      action:"bookReplacement",
-      phone:state.phone,
-      slotId:state.slotId,
-      acknowledged:true
-    });
-
-    if(result.waitlisted){
-      state.participant.status="WAITLIST";
-      state.participant.waitlistPreference=result.preference;
-      renderWaitlist(PLAN[state.slotId]);
-      return;
-    }
-
-    state.participant.status="BOOKED";
-    state.participant.appointment=result.appointment;
-    renderBookedResult(result.appointment);
-  }catch(err){
-    renderSlots(err.code==="BUSY"?tr("error"):tr("error"));
-  }
+    const result=await api({action:"bookReplacement",phone:state.phone,slotId:state.slotId,acknowledged:true});
+    if(result.waitlisted){state.participant.status="WAITLIST";state.participant.waitlistPreference=result.preference;renderWaitlist(PLAN[state.slotId]);return;}
+    state.participant.status="BOOKED";state.participant.appointment=result.appointment;renderBookedResult(result.appointment);
+  }catch{renderSlots(tr("error"));}
 }
 
 function renderWaitlist(plan){
-  state.step="waitlist";
-  setProgress(4);
-  const p=plan || planFromPreference(state.participant.waitlistPreference);
-  app.innerHTML=`
-    <h2>${tr("waitlistTitle")}</h2>
-    <div class="important"><strong>${tr("waitlistBody")}</strong></div>
-    ${p?`<div class="appointment">
-      <strong>${orderLabel(p.order)}</strong>
-      <p>${p.order==="POLYU_FIRST"
-        ? `理工 ${esc(splitSlot(p.polyuTime).time)} → 屯門 ${esc(splitSlot(p.tmhTime).time)}`
-        : `屯門 ${esc(splitSlot(p.tmhTime).time)} → 理工 ${esc(splitSlot(p.polyuTime).time)}`}</p>
-    </div>`:""}
-    <div class="actions"><a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a></div>`;
+  state.step="waitlist";setProgress(4);
+  const p=plan||planFromPreference(state.participant.waitlistPreference);
+  app.innerHTML=`<h2>${tr("waitlistTitle")}</h2><div class="important"><strong>${tr("waitlistBody")}</strong></div>${p?`<div class="appointment"><strong>${orderLabel(p.order)}</strong><p>${p.order==="POLYU_FIRST"?`理工 ${esc(splitSlot(p.polyuTime).time)} → 屯門 ${esc(splitSlot(p.tmhTime).time)}`:`屯門 ${esc(splitSlot(p.tmhTime).time)} → 理工 ${esc(splitSlot(p.polyuTime).time)}`}</p></div>`:""}<div class="actions"><a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a></div>`;
 }
 
 function resultCard(site,value,note,cls){
-  return `<div class="appointment ${cls}">
-    <span>${site}：${tr("scanTime")}</span>
-    <strong>${dateLabel(value)}<br>${esc(splitSlot(value).time)}</strong>
-    <small><strong>${tr("arrival")}：${esc(arrivalTime(value))}</strong></small>
-    <p class="muted compact">${note}</p>
-  </div>`;
+  return `<div class="appointment ${cls}"><span>${site}：${tr("scanTime")}</span><strong>${dateLabel(value)}<br>${esc(splitSlot(value).time)}</strong><small><strong>${tr("arrival")}：${esc(arrivalTime(value))}</strong></small><p class="muted compact">${note}</p></div>`;
 }
 
 function renderBookedResult(a){
-  state.step="booked";
-  setProgress(4);
+  state.step="booked";setProgress(4);
   const firstPolyu=a.order!=="TMH_FIRST";
-  const cards=firstPolyu
-    ? resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed")+resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital")
-    : resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital")+resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed");
-
-  app.innerHTML=`
-    <h2 class="success">${tr("bookedTitle")}</h2>
-    <div class="important"><strong>${tr("bookedWarning")}</strong></div>
-
-    <div class="summary">
-      <div><strong>${tr("participant")}</strong><br>${esc(state.participant.name)}</div>
-      <div><strong>${tr("order")}</strong><br>${orderLabel(a.order)}</div>
-    </div>
-
-    ${cards}
-
-    <address>
-      <strong>${tr("polyu")}</strong><br>
-      Z座地下二樓 ZB217<br>UBSN 神經科學實驗室<br>
-      ${tr("contact")}
-    </address>
-
-    <address>
-      <strong>${tr("tmh")}</strong><br>
-      主座地下放射科（X光部門）<br>新界屯門青松觀路23號<br>
-      ${tr("contact")}
-    </address>
-
-    <section class="panel">
-      <h3>${tr("routes")}</h3>
-      <div class="actions">
-        <a class="button-link" href="${FILES.polyuGuide}" target="_blank" rel="noopener">${tr("polyuRoute")}</a>
-        <a class="button-link" href="${FILES.tmhGuide}" target="_blank" rel="noopener">${tr("tmhRoute")}</a>
-      </div>
-    </section>
-
-    <section class="preparation">
-      <h3>${tr("preparation")}</h3>
-      <ul>${tr("prep").map(x=>`<li>${x}</li>`).join("")}</ul>
-    </section>
-
-    <section class="incentive">
-      <h3>${tr("incentive")}</h3>
-      <p><strong>${tr("incentiveText")}</strong></p>
-    </section>
-
-    <section class="panel">
-      <h3>${tr("docs")}</h3>
-      <div class="actions">
-        <a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">${state.lang==="zh"?"參加者須知":"Information sheet"}</a>
-        <a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${state.lang==="zh"?"同意書":"Consent form"}</a>
-      </div>
-    </section>
-
-    ${a.qr?`<div class="qr">
-      <h3>${tr("qr")}</h3>
-      <img src="${esc(a.qr)}" alt="Campus entry QR code">
-      <a class="button-link" href="${esc(a.qr)}" target="_blank" rel="noopener">${tr("qrSave")}</a>
-    </div>`:""}`;
+  const cards=firstPolyu?resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed")+resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital"):resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital")+resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed");
+  app.innerHTML=`<h2 class="success">${tr("bookedTitle")}</h2><div class="important"><strong>${tr("bookedWarning")}</strong></div><div class="summary"><div><strong>${tr("participant")}</strong><br>${esc(state.participant.name)}</div><div><strong>${tr("order")}</strong><br>${orderLabel(a.order)}</div></div>${cards}<address><strong>${tr("polyu")}</strong><br>Z座地下二樓 ZB217<br>UBSN 神經科學實驗室<br>${tr("contact")}</address><address><strong>${tr("tmh")}</strong><br>主座地下放射科（X光部門）<br>新界屯門青松觀路23號<br>${tr("contact")}</address><section class="panel"><h3>${tr("routes")}</h3><div class="actions"><a class="button-link" href="${FILES.polyuGuide}" target="_blank" rel="noopener">${tr("polyuRoute")}</a><a class="button-link" href="${FILES.tmhGuide}" target="_blank" rel="noopener">${tr("tmhRoute")}</a></div></section><section class="preparation"><h3>${tr("preparation")}</h3><ul>${tr("prep").map(x=>`<li>${x}</li>`).join("")}</ul></section><section class="incentive"><h3>${tr("incentive")}</h3><p><strong>${tr("incentiveText")}</strong></p></section><section class="panel"><h3>${tr("docs")}</h3><div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">${state.lang==="zh"?"參加者須知":"Information sheet"}</a><a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${state.lang==="zh"?"同意書":"Consent form"}</a></div></section>${a.qr?`<div class="qr"><h3>${tr("qr")}</h3><img src="${esc(a.qr)}" alt="Campus entry QR code"><a class="button-link" href="${esc(a.qr)}" target="_blank" rel="noopener">${tr("qrSave")}</a></div>`:""}`;
 }
 
-document.addEventListener("keydown",event=>{
-  if(event.key!=="Enter" || state.step!=="notices") return;
-  const tag=(event.target && event.target.tagName || "").toUpperCase();
-  if(["A","BUTTON","INPUT","SELECT","TEXTAREA"].includes(tag)) return;
-  const next=document.querySelector('#notices button[data-notice]:not([disabled])');
-  const cont=document.querySelector("#to-slots");
-  if(next){event.preventDefault();next.click();}
-  else if(cont){event.preventDefault();cont.click();}
-});
+document.addEventListener("keydown",event=>{if(event.key!=="Enter"||state.step!=="notices")return;const tag=(event.target&&event.target.tagName||"").toUpperCase();if(["A","BUTTON","INPUT","SELECT","TEXTAREA"].includes(tag))return;const next=document.querySelector('#notices button[data-notice]:not([disabled])');const cont=document.querySelector("#to-slots");if(next){event.preventDefault();next.click();}else if(cont){event.preventDefault();cont.click();}});
 
-document.querySelector("#language").onclick=()=>{
-  state.lang=state.lang==="zh"?"en":"zh";
-  translatePage();
-  const render={
-    phone:renderPhone,
-    notices:renderNotices,
-    slots:renderSlots,
-    waitlist:()=>renderWaitlist(),
-    booked:()=>renderBookedResult(state.participant.appointment)
-  }[state.step];
-  if(render) render();
-};
+document.querySelector("#language").onclick=()=>{state.lang=state.lang==="zh"?"en":"zh";translatePage();const render={phone:renderPhone,notices:renderNotices,slots:renderSlots,waitlist:()=>renderWaitlist(),booked:()=>renderBookedResult(state.participant.appointment)}[state.step];if(render)render();};
 
 translatePage();
 renderPhone();
