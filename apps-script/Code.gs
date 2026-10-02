@@ -231,7 +231,8 @@ function participantFromRow_(rowNumber,row,map) {
     polyuCompleted: yes_(get_(row,map,"PolyU scan completed")),
     tmhCompleted: yes_(get_(row,map,"TMH scan completed")),
     incentiveSite: get_(row,map,"Incentive site"),
-    incentivePaid: yes_(get_(row,map,"Incentive paid"))
+    incentivePaid: yes_(get_(row,map,"Incentive paid")),
+    standbyPreference: get_(row,map,"Standby preferences")
   };
 }
 
@@ -239,6 +240,7 @@ function publicParticipant_(p) {
   return {
     name: p.name,
     status: p.status,
+    standbyPreference: p.standbyPreference,
     height: p.height,
     weight: p.weight,
     appointment: p.polyuTime ? {
