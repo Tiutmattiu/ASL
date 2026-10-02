@@ -102,7 +102,7 @@ function standbySignup_(request) {
     put("weight", weight);
     put("height", height);
     put("handedness", handedness);
-    put("Phone", phone.replace(/^\+852/,"").replace(/^\+86/,""));
+    put("Phone", phone.replace(/^\+852/,"").replace(/^\+/,""));
     put("Status", "STANDBY_1004");
     put("Standby preferences", preferences.map(x => x + ": " + STANDBY_SLOTS[x]).join(" | "));
     put("Standby timestamp", new Date());
