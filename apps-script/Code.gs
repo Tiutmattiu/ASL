@@ -9,7 +9,7 @@ const REQUIRED_HEADERS = [
   "Incentive site","Incentive paid","Campus QR","weight","height"
 ];
 
-const STANDBY_HEADERS = ["Standby preferences","Standby timestamp"];
+const STANDBY_HEADERS = ["Standby preferences","Standby timestamp","Standby information acknowledged"];
 
 const STANDBY_SLOTS = {
   "A": "屯門醫院 10:30–11:00 → 香港理工大學 12:30–13:00",
@@ -78,6 +78,7 @@ function standbySignup_(request) {
   if (!["R","L"].includes(handedness)) fail_("BAD_HANDEDNESS","Invalid handedness");
   if (!preferences.length || preferences.some(x => !STANDBY_SLOTS[x])) fail_("BAD_PREFERENCES","Select at least one valid standby schedule");
   if (request.eligible !== true) fail_("NOT_ELIGIBLE_ACK","Eligibility confirmation is required");
+  if (request.informationRead !== true) fail_("INFO_NOT_READ","Participant information acknowledgement is required");
 
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(10000)) fail_("BUSY","Sheet is busy; please try again");
@@ -106,6 +107,7 @@ function standbySignup_(request) {
     put("Status", "STANDBY_1004");
     put("Standby preferences", preferences.map(x => x + ": " + STANDBY_SLOTS[x]).join(" | "));
     put("Standby timestamp", new Date());
+    put("Standby information acknowledged", "YES");
 
     ctx.sheet.getRange(row,1,1,values.length).setValues([values]);
     SpreadsheetApp.flush();
