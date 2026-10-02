@@ -11,21 +11,14 @@ const PLAN = {
   B:{
     polyuTime:"2026-10-04 13:00–13:30",
     tmhTime:"2026-10-04 15:00–15:30",
-    order:"POLYU_FIRST",
-    qr:"https://drive.google.com/thumbnail?id=1Lid_keX_jGDryzDUmKMq2fw080LTRPzP&sz=w1000"
-  },
-  D:{
-    polyuTime:"2026-10-04 16:30–17:00",
-    tmhTime:"2026-10-04 13:30–14:00",
-    order:"TMH_FIRST",
-    qr:"https://drive.google.com/thumbnail?id=1PnPcDVYIQP_XFe8enpLHE9VVUjXLoZOX&sz=w1000"
+    order:"POLYU_FIRST"
   }
 };
 
 const NOTICES = {
   zh:[
     "你需要在<strong>同一天</strong>完成香港理工大學及屯門醫院兩次 MRI 掃描。",
-    "兩個地點的<strong>掃描時間均為固定時間</strong>；請從目前空餘的時間段選擇。如果沒有空餘，您將被列入候補名單。",
+    "目前只有一個 10 月 4 日空缺：<strong>香港理工大學 13:00–13:30 → 屯門醫院 15:00–15:30</strong>。",
     "兩個地點都建議在<strong>掃描時間前約 30 分鐘到達</strong>。",
     "掃描前請保持<strong>至少 2 小時未進食</strong>。",
     "掃描當天<strong>請勿吸煙、飲酒、飲用咖啡或茶</strong>，並避免能量飲品及其他含咖啡因產品。",
@@ -38,7 +31,7 @@ const NOTICES = {
   ],
   en:[
     "Both MRI scans must be completed on the <strong>same day</strong>.",
-    "The scan times at <strong>both sites are fixed</strong>. Choose one of the paired arrangements that is still available.",
+    "There is currently one opening on 4 October: <strong>PolyU 13:00–13:30 → Tuen Mun Hospital 15:00–15:30</strong>.",
     "Please arrive about <strong>30 minutes before each scan</strong>.",
     "Do not eat for at least <strong>2 hours</strong> before scanning.",
     "On the scan day, <strong>do not smoke or drink alcohol, coffee or tea</strong>, and avoid energy drinks and other caffeinated products.",
@@ -63,7 +56,6 @@ const T = {
     finding:"正在查找…",
     notFound:"找不到這個電話號碼，請確認後再試。",
     error:"暫時無法連接系統，請稍後再試。",
-    participant:"參加者",
     participantInfo:"參加者資料",
     name:"姓名",
     gender:"性別",
@@ -83,25 +75,26 @@ const T = {
     notices:"請逐項閱讀",
     understand:"我知道了",
     understood:"已明白 ✓",
-    choose:"選擇一個掃描安排",
-    chooseHelp:"請選擇最適合你的安排；不必勉強選擇目前的 10 月 4 日時段。",
+    choose:"選擇安排",
+    chooseHelp:"請選擇真正適合你的安排，不需要勉強選擇 10 月 4 日。",
+    oct4Choice:"10 月 4 日正式預約",
+    oct4Help:"理工 13:00–13:30 → 屯門 15:00–15:30",
     oct10Choice:"候補 10 月 10 日掃描",
-    oct10Help:"如果 10 月 10 日有空缺，研究團隊會再聯絡你確認具體時間。",
+    oct10Help:"如 10 月 10 日有合適空缺，研究團隊會再聯絡你確認具體時間。",
     unavailableChoice:"以上日期都不方便",
-    unavailableHelp:"不加入目前候補名單；我們只記錄這個選擇。",
+    unavailableHelp:"不建立目前預約或候補；只記錄這個選擇。",
     submitChoice:"提交選擇",
+    back:"返回",
+    needChoice:"請先選擇一項。",
+    processing:"正在處理…",
+    bookedTitle:"預約成功",
+    bookedWarning:"你的掃描時間已正式確認。",
+    waitlistTitle:"已加入 10 月 4 日候補名單",
+    waitlistBody:"這個 10 月 4 日時段剛剛已被其他參加者預約。你已加入該時段候補名單；如有空缺，研究團隊會聯絡你。",
     oct10WaitlistTitle:"已加入 10 月 10 日候補名單",
     oct10WaitlistBody:"如 10 月 10 日出現合適空缺，研究團隊會聯絡你確認具體掃描時間。未收到確認前請勿自行前往。",
     unavailableTitle:"已記錄",
     unavailableBody:"已記錄目前提供的日期都不方便，不會為你建立預約或候補時段。",
-    back:"返回",
-    book:"確認預約",
-    booking:"正在處理…",
-    needChoice:"請先選擇一個安排。",
-    bookedTitle:"預約成功",
-    bookedWarning:"你的掃描時間已正式確認。",
-    waitlistTitle:"已加入候補名單",
-    waitlistBody:"你選擇的安排已被其他參加者預約。你已加入該安排的候補名單；如有空缺，研究團隊會聯絡你。請勿自行前往。",
     order:"掃描順序",
     polyu:"香港理工大學 UBSN",
     tmh:"屯門醫院",
@@ -141,7 +134,6 @@ const T = {
     finding:"Looking up…",
     notFound:"We could not find that phone number.",
     error:"The service is temporarily unavailable. Please try again later.",
-    participant:"Participant",
     participantInfo:"Participant details",
     name:"Name",
     gender:"Sex",
@@ -161,25 +153,26 @@ const T = {
     notices:"Please read each item",
     understand:"I understand",
     understood:"Understood ✓",
-    choose:"Choose one scan arrangement",
-    chooseHelp:"Choose the option that actually works for you. You do not need to select one of the 4 October slots.",
+    choose:"Choose an arrangement",
+    chooseHelp:"Choose what actually works for you. You do not need to select 4 October.",
+    oct4Choice:"Confirm 4 October booking",
+    oct4Help:"PolyU 13:00–13:30 → Tuen Mun Hospital 15:00–15:30",
     oct10Choice:"Waitlist for 10 October",
     oct10Help:"If a suitable place becomes available on 10 October, the study team will contact you to confirm the exact time.",
     unavailableChoice:"None of these dates work",
-    unavailableHelp:"You will not be added to the current waitlist; we will only record this choice.",
+    unavailableHelp:"No current booking or waitlist place will be created; we will only record this choice.",
     submitChoice:"Submit choice",
+    back:"Back",
+    needChoice:"Please choose an option first.",
+    processing:"Processing…",
+    bookedTitle:"Booking confirmed",
+    bookedWarning:"Your scan times are confirmed.",
+    waitlistTitle:"Added to the 4 October waitlist",
+    waitlistBody:"The 4 October slot was just taken by another participant. You have been added to its waitlist. The study team will contact you if it becomes available.",
     oct10WaitlistTitle:"Added to the 10 October waitlist",
     oct10WaitlistBody:"If a suitable place becomes available on 10 October, the study team will contact you to confirm the exact scan time. Please do not attend unless contacted.",
     unavailableTitle:"Preference recorded",
     unavailableBody:"We recorded that the currently offered dates do not work for you. No booking or waitlist place has been created.",
-    back:"Back",
-    book:"Confirm booking",
-    booking:"Processing…",
-    needChoice:"Please choose an arrangement first.",
-    bookedTitle:"Booking confirmed",
-    bookedWarning:"Your scan times are confirmed.",
-    waitlistTitle:"Added to the waitlist",
-    waitlistBody:"The arrangement you selected has already been booked. You have been added to its waitlist. The study team will contact you if it becomes available. Please do not attend unless contacted.",
     order:"Scan order",
     polyu:"PolyU UBSN",
     tmh:"Tuen Mun Hospital",
@@ -210,124 +203,211 @@ const T = {
   }
 };
 
-const state={lang:"zh",step:"phone",phone:"",participant:null,noticesDone:0,choice:"",openSlots:[],compactFlow:false};
-const app=document.querySelector("#app");
-const tr=key=>T[state.lang][key];
+const state = {
+  lang:"zh",
+  step:"phone",
+  phone:"",
+  participant:null,
+  noticesDone:0,
+  choice:"",
+  october4Open:false,
+  compactFlow:false
+};
 
-function esc(value=""){const el=document.createElement("span");el.textContent=value==null?"":String(value);return el.innerHTML;}
-function setProgress(n){document.querySelector("#progress").textContent=n?`${tr("step")} ${n} / 5`:"";}
-function translatePage(){document.documentElement.lang=state.lang==="zh"?"zh-Hant":"en";document.querySelectorAll("[data-text]").forEach(el=>el.textContent=tr(el.dataset.text));document.querySelector("#language").textContent=state.lang==="zh"?"English":"中文";}
-function splitSlot(value){const text=String(value||"").trim();const i=text.indexOf(" ");return i<0?{date:"",time:text}:{date:text.slice(0,i),time:text.slice(i+1)};}
-function dateLabel(value){const d=splitSlot(value).date;return d==="2026-10-04"?(state.lang==="zh"?"2026 年 10 月 4 日":"4 October 2026"):d;}
-function arrivalTime(value){const m=splitSlot(value).time.match(/(\d{1,2}):(\d{2})/);if(!m)return"";const t=(Number(m[1])*60+Number(m[2])-30+1440)%1440;return String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0");}
-function orderLabel(order){if(state.lang==="zh")return order==="POLYU_FIRST"?"香港理工大學 → 屯門醫院":"屯門醫院 → 香港理工大學";return order==="POLYU_FIRST"?"PolyU → Tuen Mun Hospital":"Tuen Mun Hospital → PolyU";}
-function planFromPreference(pref){const id=String(pref||"").split(":")[0].trim();return PLAN[id]?{id,...PLAN[id]}:null;}
+const app = document.querySelector("#app");
+const tr = key => T[state.lang][key];
 
-async function api(payload){
-  const response=await fetch(ASL_CONFIG.WEB_APP_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
-  const result=await response.json();
-  if(!result.ok)throw Object.assign(new Error(result.message||"API error"),{code:result.code});
-  return result;
+function esc(value="") {
+  const el = document.createElement("span");
+  el.textContent = value == null ? "" : String(value);
+  return el.innerHTML;
 }
 
-function genderLabel(gender){
-  const value=String(gender||"").trim().toUpperCase();
-  if(value==="M") return tr("male");
-  if(value==="F") return tr("female");
+function setProgress(n) {
+  document.querySelector("#progress").textContent = n ? `${tr("step")} ${n} / 5` : "";
+}
+
+function translatePage() {
+  document.documentElement.lang = state.lang === "zh" ? "zh-Hant" : "en";
+  document.querySelectorAll("[data-text]").forEach(el => el.textContent = tr(el.dataset.text));
+  document.querySelector("#language").textContent = state.lang === "zh" ? "English" : "中文";
+}
+
+function splitSlot(value) {
+  const text = String(value || "").trim();
+  const i = text.indexOf(" ");
+  return i < 0 ? {date:"",time:text} : {date:text.slice(0,i),time:text.slice(i+1)};
+}
+
+function dateLabel(value) {
+  const d = splitSlot(value).date;
+  return d === "2026-10-04"
+    ? (state.lang === "zh" ? "2026 年 10 月 4 日" : "4 October 2026")
+    : d;
+}
+
+function arrivalTime(value) {
+  const m = splitSlot(value).time.match(/(\d{1,2}):(\d{2})/);
+  if (!m) return "";
+  const t = (Number(m[1])*60 + Number(m[2]) - 30 + 1440) % 1440;
+  return String(Math.floor(t/60)).padStart(2,"0") + ":" + String(t%60).padStart(2,"0");
+}
+
+function orderLabel(order) {
+  if (state.lang === "zh") {
+    return order === "POLYU_FIRST" ? "香港理工大學 → 屯門醫院" : "屯門醫院 → 香港理工大學";
+  }
+  return order === "POLYU_FIRST" ? "PolyU → Tuen Mun Hospital" : "Tuen Mun Hospital → PolyU";
+}
+
+function genderLabel(gender) {
+  const value = String(gender || "").trim().toUpperCase();
+  if (value === "M") return tr("male");
+  if (value === "F") return tr("female");
   return tr("other");
 }
 
-function participantSummary(){
-  const p=state.participant;
+function preferenceKind(pref) {
+  const value = String(pref || "").trim().toUpperCase();
+  if (value.startsWith("OCT10")) return "OCT10";
+  if (value.startsWith("B:")) return "B";
+  if (value.startsWith("NONE")) return "NONE";
+  return "";
+}
+
+function participantSummary() {
+  const p = state.participant;
   return `<div class="summary">
     <div><strong>${tr("name")}</strong><br>${esc(p.name)}</div>
     <div><strong>${tr("gender")}</strong><br>${esc(genderLabel(p.gender))}</div>
-    <div><strong>${tr("age")}</strong><br>${esc(p.age||"—")}</div>
-    <div><strong>${tr("phone")}</strong><br>${esc(p.phone||state.phone)}</div>
+    <div><strong>${tr("age")}</strong><br>${esc(p.age || "—")}</div>
+    <div><strong>${tr("phone")}</strong><br>${esc(p.phone || state.phone)}</div>
   </div>`;
 }
 
-function renderPhone(error=""){
-  state.step="phone";setProgress(1);
-  app.innerHTML=`<h2>${tr("phoneTitle")}</h2><p class="muted">${tr("phoneHelp")}</p>${error?`<p class="error">${esc(error)}</p>`:""}<form id="phone-form"><label>${tr("phone")}</label><div class="phone"><select id="country"><option value="+852">+852 Hong Kong</option><option value="+86">+86 Mainland China</option></select><input id="phone" type="tel" inputmode="tel" autocomplete="tel" required></div><button type="submit">${tr("continue")}</button></form>`;
-  document.querySelector("#phone-form").onsubmit=lookup;
+async function api(payload) {
+  const response = await fetch(ASL_CONFIG.WEB_APP_URL,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  });
+
+  const result = await response.json();
+  if (!result.ok) {
+    throw Object.assign(new Error(result.message || "API error"),{code:result.code});
+  }
+  return result;
 }
 
-async function lookup(e){
-  e.preventDefault();
-  const btn=e.currentTarget.querySelector("button");
-  btn.disabled=true;
-  btn.textContent=tr("finding");
-  state.phone=document.querySelector("#country").value+document.querySelector("#phone").value.replace(/\s+/g,"");
+function renderPhone(error="") {
+  state.step = "phone";
+  setProgress(1);
 
-  try{
-    const result=await api({action:"lookup",phone:state.phone});
-    state.participant=result.participant;
-    state.openSlots=Array.isArray(result.openSlots)?result.openSlots:[];
+  app.innerHTML = `
+    <h2>${tr("phoneTitle")}</h2>
+    <p class="muted">${tr("phoneHelp")}</p>
+    ${error ? `<p class="error">${esc(error)}</p>` : ""}
+    <form id="phone-form">
+      <label>${tr("phone")}</label>
+      <div class="phone">
+        <select id="country">
+          <option value="+852">+852 Hong Kong</option>
+          <option value="+86">+86 Mainland China</option>
+        </select>
+        <input id="phone" type="tel" inputmode="tel" autocomplete="tel" required>
+      </div>
+      <button type="submit">${tr("continue")}</button>
+    </form>`;
 
-    if(state.participant.status==="COMPLETED"){
-      state.step="completed";
+  document.querySelector("#phone-form").onsubmit = lookup;
+}
+
+async function lookup(event) {
+  event.preventDefault();
+
+  const btn = event.currentTarget.querySelector("button");
+  btn.disabled = true;
+  btn.textContent = tr("finding");
+
+  state.phone = document.querySelector("#country").value +
+    document.querySelector("#phone").value.replace(/\s+/g,"");
+
+  try {
+    const result = await api({action:"lookup",phone:state.phone});
+    state.participant = result.participant;
+    state.october4Open = result.october4Open === true;
+    state.choice = "";
+
+    if (state.participant.status === "COMPLETED") {
+      state.step = "completed";
       setProgress(1);
-      app.innerHTML=`<h2>${esc(state.participant.name)}</h2><div class="important">${tr("completed")}</div>`;
+      app.innerHTML = `<h2>${esc(state.participant.name)}</h2><div class="important">${tr("completed")}</div>`;
       return;
     }
 
-    if(state.participant.appointment){
+    if (state.participant.appointment) {
       renderBookedResult(state.participant.appointment);
       return;
     }
 
-    if(state.participant.status==="WAITLIST"){
-      renderWaitlist(planFromPreference(state.participant.waitlistPreference));
+    const pref = preferenceKind(state.participant.waitlistPreference);
+
+    if (pref === "OCT10") {
+      renderWaitlist("OCT10");
       return;
     }
 
-    if(String(state.participant.waitlistPreference||"").startsWith("NONE")){
+    if (pref === "B" && !state.october4Open) {
+      renderWaitlist("B");
+      return;
+    }
+
+    if (pref === "NONE") {
       renderUnavailable();
       return;
     }
 
-    if(state.openSlots.length===0){
-      state.compactFlow=true;
+    if (!state.october4Open) {
+      state.compactFlow = true;
       renderChoicesOnly();
       return;
     }
 
-    state.compactFlow=false;
+    state.compactFlow = false;
     renderProfile();
-  }catch(err){
-    renderPhone(err.code==="NOT_FOUND"?tr("notFound"):tr("error"));
+  } catch (err) {
+    renderPhone(err.code === "NOT_FOUND" ? tr("notFound") : tr("error"));
   }
 }
 
-function renderProfile(message=""){
-  state.step="profile";
+function renderProfile(message="") {
+  state.step = "profile";
   setProgress(2);
-  const p=state.participant;
+  const p = state.participant;
 
-  app.innerHTML=`
+  app.innerHTML = `
     <h2>${tr("participantInfo")}</h2>
     ${participantSummary()}
 
     <section class="panel">
       <h3>${tr("profileTitle")}</h3>
       <p class="muted">${tr("profileHelp")}</p>
-      ${message?`<p class="error">${esc(message)}</p>`:""}
+      ${message ? `<p class="error">${esc(message)}</p>` : ""}
 
       <form id="profile-form" class="profile-grid">
         <label>${tr("height")}
-          <input id="height" type="number" min="100" max="250" step="0.1" value="${esc(p.height||"")}" required>
+          <input id="height" type="number" min="100" max="250" step="0.1" value="${esc(p.height || "")}" required>
         </label>
 
         <label>${tr("weight")}
-          <input id="weight" type="number" min="20" max="300" step="0.1" value="${esc(p.weight||"")}" required>
+          <input id="weight" type="number" min="20" max="300" step="0.1" value="${esc(p.weight || "")}" required>
         </label>
 
         <label>${tr("handedness")}
           <select id="handedness" required>
             <option value=""></option>
-            <option value="R" ${p.handedness==="R"?"selected":""}>${tr("right")}</option>
-            <option value="L" ${p.handedness==="L"?"selected":""}>${tr("left")}</option>
+            <option value="R" ${p.handedness === "R" ? "selected" : ""}>${tr("right")}</option>
+            <option value="L" ${p.handedness === "L" ? "selected" : ""}>${tr("left")}</option>
           </select>
         </label>
 
@@ -335,245 +415,228 @@ function renderProfile(message=""){
       </form>
     </section>`;
 
-  document.querySelector("#profile-form").onsubmit=saveProfileAndContinue;
+  document.querySelector("#profile-form").onsubmit = saveProfileAndContinue;
 }
 
-async function saveProfileAndContinue(event){
+async function saveProfileAndContinue(event) {
   event.preventDefault();
 
-  const button=document.querySelector("#profile-save");
-  button.disabled=true;
-  button.textContent=tr("saving");
+  const button = document.querySelector("#profile-save");
+  button.disabled = true;
+  button.textContent = tr("saving");
 
-  const height=document.querySelector("#height").value;
-  const weight=document.querySelector("#weight").value;
-  const handedness=document.querySelector("#handedness").value;
-
-  try{
-    const result=await api({
+  try {
+    const result = await api({
       action:"updateProfile",
       phone:state.phone,
-      height:height,
-      weight:weight,
-      handedness:handedness
+      height:document.querySelector("#height").value,
+      weight:document.querySelector("#weight").value,
+      handedness:document.querySelector("#handedness").value
     });
 
-    state.participant.height=result.height;
-    state.participant.weight=result.weight;
-    state.participant.handedness=result.handedness;
-    state.noticesDone=0;
+    state.participant.height = result.height;
+    state.participant.weight = result.weight;
+    state.participant.handedness = result.handedness;
+    state.noticesDone = 0;
     renderNotices();
-  }catch(err){
-    renderProfile(err.message||tr("error"));
+  } catch (err) {
+    renderProfile(err.message || tr("error"));
   }
 }
 
-function renderNotices(){
-  state.step="notices";
+function renderNotices() {
+  state.step = "notices";
   setProgress(3);
 
-  app.innerHTML=`
+  app.innerHTML = `
     ${participantSummary()}
     <h2 style="margin-top:22px">${tr("notices")}</h2>
     <div id="notices"></div>`;
 
-  const list=document.querySelector("#notices");
+  const list = document.querySelector("#notices");
 
-  NOTICES[state.lang].forEach((text,index)=>{
-    const done=index<state.noticesDone;
-    const unlocked=index<=state.noticesDone;
+  NOTICES[state.lang].forEach((text,index) => {
+    const done = index < state.noticesDone;
+    const unlocked = index <= state.noticesDone;
 
-    list.insertAdjacentHTML("beforeend",
-      `<div class="notice ${done?"done":unlocked?"":"locked"}">
+    list.insertAdjacentHTML("beforeend",`
+      <div class="notice ${done ? "done" : unlocked ? "" : "locked"}">
         <p>${text}</p>
-        <button type="button" data-notice="${index}" ${unlocked&&!done?"":"disabled"}>
-          ${done?tr("understood"):tr("understand")}
+        <button type="button" data-notice="${index}" ${unlocked && !done ? "" : "disabled"}>
+          ${done ? tr("understood") : tr("understand")}
         </button>
       </div>`);
   });
 
-  if(state.noticesDone===NOTICES[state.lang].length){
-    list.insertAdjacentHTML("beforeend",
-      `<div class="actions"><button id="to-slots" type="button">${tr("continue")}</button></div>`);
+  if (state.noticesDone === NOTICES[state.lang].length) {
+    list.insertAdjacentHTML("beforeend",`
+      <div class="actions">
+        <button id="to-choices" type="button">${tr("continue")}</button>
+      </div>`);
   }
 
-  list.onclick=event=>{
-    const button=event.target.closest("button[data-notice]");
-    if(!button||button.disabled) return;
-    state.noticesDone++;
+  list.onclick = event => {
+    const button = event.target.closest("button[data-notice]");
+    if (!button || button.disabled) return;
+    state.noticesDone += 1;
     renderNotices();
   };
 
-  const continueButton=document.querySelector("#to-slots");
-  if(continueButton){
-    continueButton.onclick=()=>renderSlots();
-  }
+  document.querySelector("#to-choices")?.addEventListener("click",() => renderChoices());
 }
 
-function choiceButtons(){
-  const october4=Object.entries(PLAN)
-    .filter(([id])=>state.openSlots.includes(id))
-    .map(([id,p])=>`
-      <button class="choice paired-choice ${state.choice===id?"selected":""}" type="button" data-choice="${id}">
-        <strong>${orderLabel(p.order)}</strong>
-        <span>${p.order==="POLYU_FIRST"
-          ?`理工 ${esc(splitSlot(p.polyuTime).time)}　→　屯門 ${esc(splitSlot(p.tmhTime).time)}`
-          :`屯門 ${esc(splitSlot(p.tmhTime).time)}　→　理工 ${esc(splitSlot(p.polyuTime).time)}`}</span>
-      </button>`)
-    .join("");
-
+function choiceButtons(includeOct4) {
   return `
-    ${october4}
+    ${includeOct4 ? `
+      <button class="choice paired-choice ${state.choice === "B" ? "selected" : ""}" type="button" data-choice="B">
+        <strong>${tr("oct4Choice")}</strong>
+        <span>${tr("oct4Help")}</span>
+      </button>` : ""}
 
-    <button class="choice paired-choice ${state.choice==="OCT10"?"selected":""}" type="button" data-choice="OCT10">
+    <button class="choice paired-choice ${state.choice === "OCT10" ? "selected" : ""}" type="button" data-choice="OCT10">
       <strong>${tr("oct10Choice")}</strong>
       <span>${tr("oct10Help")}</span>
     </button>
 
-    <button class="choice paired-choice ${state.choice==="NONE"?"selected":""}" type="button" data-choice="NONE">
+    <button class="choice paired-choice ${state.choice === "NONE" ? "selected" : ""}" type="button" data-choice="NONE">
       <strong>${tr("unavailableChoice")}</strong>
       <span>${tr("unavailableHelp")}</span>
     </button>`;
 }
 
-function bindChoiceScreen(){
-  app.querySelectorAll("[data-choice]").forEach(btn=>{
-    btn.onclick=()=>{
-      state.choice=btn.dataset.choice;
-      state.compactFlow?renderChoicesOnly():renderSlots();
+function bindChoices(compact) {
+  app.querySelectorAll("[data-choice]").forEach(button => {
+    button.onclick = () => {
+      state.choice = button.dataset.choice;
+      compact ? renderChoicesOnly() : renderChoices();
     };
   });
 
-  const submit=document.querySelector("#book");
-  if(submit) submit.onclick=submitChoice;
+  document.querySelector("#submit-choice").onclick = submitChoice;
 }
 
-function renderChoicesOnly(message=""){
-  state.step="choicesOnly";
-  setProgress(2);
-
-  app.innerHTML=`
-    <h2>${tr("choose")}</h2>
-    <p class="muted">${tr("chooseHelp")}</p>
-    ${message?`<p class="error">${esc(message)}</p>`:""}
-    <div class="paired-choice-list">${choiceButtons()}</div>
-    <div class="actions">
-      <button id="book" type="button">${tr("submitChoice")}</button>
-    </div>`;
-
-  bindChoiceScreen();
-}
-
-function renderSlots(message=""){
-  state.step="slots";
+function renderChoices(message="") {
+  state.step = "choices";
   setProgress(4);
 
-  app.innerHTML=`
+  app.innerHTML = `
     <h2>${tr("choose")}</h2>
     <p class="muted">${tr("chooseHelp")}</p>
-    ${message?`<p class="error">${esc(message)}</p>`:""}
-    <div class="paired-choice-list">${choiceButtons()}</div>
+    ${message ? `<p class="error">${esc(message)}</p>` : ""}
+    <div class="paired-choice-list">${choiceButtons(state.october4Open)}</div>
     <div class="actions">
       <button class="secondary" id="back" type="button">${tr("back")}</button>
-      <button id="book" type="button">${tr("submitChoice")}</button>
+      <button id="submit-choice" type="button">${tr("submitChoice")}</button>
     </div>`;
 
-  document.querySelector("#back").onclick=()=>renderNotices();
-  bindChoiceScreen();
+  document.querySelector("#back").onclick = () => renderNotices();
+  bindChoices(false);
 }
 
-async function submitChoice(event){
-  if(!state.choice){
-    state.compactFlow?renderChoicesOnly(tr("needChoice")):renderSlots(tr("needChoice"));
+function renderChoicesOnly(message="") {
+  state.step = "choicesOnly";
+  setProgress(2);
+
+  app.innerHTML = `
+    <h2>${tr("choose")}</h2>
+    <p class="muted">${tr("chooseHelp")}</p>
+    ${message ? `<p class="error">${esc(message)}</p>` : ""}
+    <div class="paired-choice-list">${choiceButtons(false)}</div>
+    <div class="actions">
+      <button id="submit-choice" type="button">${tr("submitChoice")}</button>
+    </div>`;
+
+  bindChoices(true);
+}
+
+async function submitChoice(event) {
+  if (!state.choice) {
+    state.compactFlow ? renderChoicesOnly(tr("needChoice")) : renderChoices(tr("needChoice"));
     return;
   }
 
-  event.currentTarget.disabled=true;
-  event.currentTarget.textContent=tr("booking");
+  event.currentTarget.disabled = true;
+  event.currentTarget.textContent = tr("processing");
 
-  try{
-    if(state.choice==="OCT10"||state.choice==="NONE"){
-      const result=await api({
+  try {
+    if (state.choice === "OCT10" || state.choice === "NONE") {
+      const result = await api({
         action:"recordPreference",
         phone:state.phone,
         preference:state.choice
       });
 
-      if(result.booked&&result.appointment){
-        state.participant.status="BOOKED";
-        state.participant.appointment=result.appointment;
+      if (result.booked && result.appointment) {
+        state.participant.status = "BOOKED";
+        state.participant.appointment = result.appointment;
         renderBookedResult(result.appointment);
         return;
       }
 
-      state.participant.waitlistPreference=result.preference||"";
+      state.participant.waitlistPreference = result.preference || "";
 
-      if(state.choice==="OCT10"){
-        state.participant.status="WAITLIST";
-        renderWaitlist(null);
-      }else{
-        state.participant.status="";
+      if (state.choice === "OCT10") {
+        state.participant.status = "WAITLIST";
+        renderWaitlist("OCT10");
+      } else {
+        state.participant.status = "";
         renderUnavailable();
       }
       return;
     }
 
-    const result=await api({
+    const result = await api({
       action:"bookReplacement",
       phone:state.phone,
-      slotId:state.choice,
+      slotId:"B",
       acknowledged:true
     });
 
-    if(result.waitlisted){
-      state.participant.status="WAITLIST";
-      state.participant.waitlistPreference=result.preference;
-      renderWaitlist(PLAN[state.choice]);
+    if (result.waitlisted) {
+      state.participant.status = "WAITLIST";
+      state.participant.waitlistPreference = result.preference;
+      renderWaitlist("B");
       return;
     }
 
-    state.participant.status="BOOKED";
-    state.participant.appointment=result.appointment;
+    state.participant.status = "BOOKED";
+    state.participant.appointment = result.appointment;
     renderBookedResult(result.appointment);
-  }catch(err){
+  } catch (err) {
     state.compactFlow
-      ?renderChoicesOnly(err.message||tr("error"))
-      :renderSlots(err.message||tr("error"));
+      ? renderChoicesOnly(err.message || tr("error"))
+      : renderChoices(err.message || tr("error"));
   }
 }
 
+function renderWaitlist(kind) {
+  state.step = "waitlist";
+  setProgress(state.compactFlow ? 2 : 5);
 
-function renderWaitlist(plan){
-  state.step="waitlist";
-  setProgress(state.compactFlow?2:5);
+  const oct10 = kind === "OCT10";
 
-  const preference=String(state.participant.waitlistPreference||"");
-  const isOct10=preference.startsWith("OCT10");
-  const p=plan||planFromPreference(preference);
-
-  app.innerHTML=`
-    <h2>${isOct10?tr("oct10WaitlistTitle"):tr("waitlistTitle")}</h2>
+  app.innerHTML = `
+    <h2>${oct10 ? tr("oct10WaitlistTitle") : tr("waitlistTitle")}</h2>
     <div class="important">
-      <strong>${isOct10?tr("oct10WaitlistBody"):tr("waitlistBody")}</strong>
+      <strong>${oct10 ? tr("oct10WaitlistBody") : tr("waitlistBody")}</strong>
     </div>
 
-    ${p?`<div class="appointment">
-      <strong>${orderLabel(p.order)}</strong>
-      <p>${p.order==="POLYU_FIRST"
-        ?`理工 ${esc(splitSlot(p.polyuTime).time)} → 屯門 ${esc(splitSlot(p.tmhTime).time)}`
-        :`屯門 ${esc(splitSlot(p.tmhTime).time)} → 理工 ${esc(splitSlot(p.polyuTime).time)}`}</p>
-    </div>`:""}
+    ${!oct10 ? `
+      <div class="appointment">
+        <strong>${tr("oct4Choice")}</strong>
+        <p>${tr("oct4Help")}</p>
+      </div>` : ""}
 
     <div class="actions">
       <a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a>
     </div>`;
 }
 
-function renderUnavailable(){
-  state.step="unavailable";
-  setProgress(state.compactFlow?2:5);
+function renderUnavailable() {
+  state.step = "unavailable";
+  setProgress(state.compactFlow ? 2 : 5);
 
-  app.innerHTML=`
+  app.innerHTML = `
     <h2>${tr("unavailableTitle")}</h2>
     <div class="important"><strong>${tr("unavailableBody")}</strong></div>
     <div class="actions">
@@ -581,20 +644,24 @@ function renderUnavailable(){
     </div>`;
 }
 
-function resultCard(site,value,note,cls){
-  return `<div class="appointment ${cls}"><span>${site}：${tr("scanTime")}</span><strong>${dateLabel(value)}<br>${esc(splitSlot(value).time)}</strong><small><strong>${tr("arrival")}：${esc(arrivalTime(value))}</strong></small><p class="muted compact">${note}</p></div>`;
+function resultCard(site,value,note,cls) {
+  return `<div class="appointment ${cls}">
+    <span>${site}：${tr("scanTime")}</span>
+    <strong>${dateLabel(value)}<br>${esc(splitSlot(value).time)}</strong>
+    <small><strong>${tr("arrival")}：${esc(arrivalTime(value))}</strong></small>
+    <p class="muted compact">${note}</p>
+  </div>`;
 }
 
-function renderBookedResult(a){
-  state.step="booked";
+function renderBookedResult(a) {
+  state.step = "booked";
   setProgress(5);
 
-  const firstPolyu=a.order!=="TMH_FIRST";
-  const cards=firstPolyu
-    ?resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed")+resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital")
-    :resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital")+resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed");
+  const cards =
+    resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed") +
+    resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital");
 
-  app.innerHTML=`
+  app.innerHTML = `
     <h2 class="success">${tr("bookedTitle")}</h2>
     <div class="important"><strong>${tr("bookedWarning")}</strong></div>
 
@@ -630,7 +697,7 @@ function renderBookedResult(a){
 
     <section class="preparation">
       <h3>${tr("preparation")}</h3>
-      <ul>${tr("prep").map(x=>`<li>${x}</li>`).join("")}</ul>
+      <ul>${tr("prep").map(x => `<li>${x}</li>`).join("")}</ul>
     </section>
 
     <section class="incentive">
@@ -638,26 +705,61 @@ function renderBookedResult(a){
       <p><strong>${tr("incentiveText")}</strong></p>
     </section>
 
-    ${a.qr?`<div class="qr">
-      <h3>${tr("qr")}</h3>
-      <img src="${esc(a.qr)}" alt="Campus entry QR code">
-      <a class="button-link" href="${esc(a.qr)}" target="_blank" rel="noopener">${tr("qrSave")}</a>
-    </div>`:""}
+    ${a.qr ? `
+      <div class="qr">
+        <h3>${tr("qr")}</h3>
+        <img src="${esc(a.qr)}" alt="Campus entry QR code">
+        <a class="button-link" href="${esc(a.qr)}" target="_blank" rel="noopener">${tr("qrSave")}</a>
+      </div>` : ""}
 
     <section class="panel">
       <h3>${tr("docs")}</h3>
       <p>${tr("docsSend")}</p>
       <div class="actions">
-        <a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">${state.lang==="zh"?"參加者須知":"Information sheet"}</a>
-        <a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${state.lang==="zh"?"同意書":"Consent form"}</a>
+        <a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">${state.lang === "zh" ? "參加者須知" : "Information sheet"}</a>
+        <a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${state.lang === "zh" ? "同意書" : "Consent form"}</a>
         <a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a>
       </div>
     </section>`;
 }
 
-document.addEventListener("keydown",event=>{if(event.key!=="Enter"||state.step!=="notices")return;const tag=(event.target&&event.target.tagName||"").toUpperCase();if(["A","BUTTON","INPUT","SELECT","TEXTAREA"].includes(tag))return;const next=document.querySelector('#notices button[data-notice]:not([disabled])');const cont=document.querySelector("#to-slots");if(next){event.preventDefault();next.click();}else if(cont){event.preventDefault();cont.click();}});
+document.addEventListener("keydown",event => {
+  if (event.key !== "Enter" || state.step !== "notices") return;
 
-document.querySelector("#language").onclick=()=>{state.lang=state.lang==="zh"?"en":"zh";translatePage();const render={phone:renderPhone,profile:renderProfile,notices:renderNotices,slots:()=>renderSlots(),choicesOnly:()=>renderChoicesOnly(),waitlist:()=>renderWaitlist(),unavailable:()=>renderUnavailable(),booked:()=>renderBookedResult(state.participant.appointment)}[state.step];if(render)render();};
+  const tag = (event.target && event.target.tagName || "").toUpperCase();
+  if (["A","INPUT","SELECT","TEXTAREA"].includes(tag)) return;
+
+  const next = document.querySelector('#notices button[data-notice]:not([disabled])');
+  const cont = document.querySelector("#to-choices");
+
+  if (next) {
+    event.preventDefault();
+    next.click();
+  } else if (cont) {
+    event.preventDefault();
+    cont.click();
+  }
+});
+
+document.querySelector("#language").onclick = () => {
+  state.lang = state.lang === "zh" ? "en" : "zh";
+  translatePage();
+
+  const renderers = {
+    phone:() => renderPhone(),
+    profile:() => renderProfile(),
+    notices:() => renderNotices(),
+    choices:() => renderChoices(),
+    choicesOnly:() => renderChoicesOnly(),
+    waitlist:() => renderWaitlist(preferenceKind(state.participant.waitlistPreference) || "B"),
+    unavailable:() => renderUnavailable(),
+    booked:() => renderBookedResult(state.participant.appointment)
+  };
+
+  if (renderers[state.step]) {
+    renderers[state.step]();
+  }
+};
 
 translatePage();
 renderPhone();
