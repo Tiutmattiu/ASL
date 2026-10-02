@@ -397,7 +397,14 @@ async function submitStandby(e){
   }catch(err){
     e.target.disabled=false;
     e.target.textContent=tr("submit");
-    const msg=err.code==="ALREADY_BOOKED"?tr("alreadyBooked"):err.code==="ALREADY_REGISTERED"?tr("alreadyRegistered"):tr("genericError");
+    const debug = new URLSearchParams(location.search).get("debug") === "1";
+    const msg = err.code==="ALREADY_BOOKED"
+      ? tr("alreadyBooked")
+      : err.code==="ALREADY_REGISTERED"
+        ? tr("alreadyRegistered")
+        : debug
+          ? `${tr("genericError")} [${err.code || "NO_CODE"}] ${err.message || ""}`
+          : tr("genericError");
     renderSlots(msg);
   }
 }
