@@ -22,3 +22,6 @@ footer{padding:24px 0 36px;color:#66807c;font-size:.82rem;text-align:center}
 .standby-choice small{margin-top:10px}
 .study-intro{margin-bottom:18px}
 .notice-list .notice{margin:10px 0}
+
+.standby-review{margin:12px 0;padding:14px;border-radius:12px;background:#f4f8f7}
+.standby-review>div{padding:10px;background:white;border-radius:10px}
