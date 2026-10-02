@@ -66,6 +66,22 @@ const T = {
     notFound:"找不到這個電話號碼，請確認後再試。",
     error:"暫時無法連接系統，請稍後再試。",
     participant:"參加者",
+    participantInfo:"參加者資料",
+    name:"姓名",
+    gender:"性別",
+    age:"年齡",
+    male:"男",
+    female:"女",
+    other:"其他",
+    profileTitle:"補充資料",
+    profileHelp:"請確認身高、體重及慣用手。這些資料會用於屯門醫院登記。",
+    height:"身高（cm）",
+    weight:"體重（kg）",
+    handedness:"慣用手",
+    right:"右手",
+    left:"左手",
+    saveContinue:"儲存並繼續",
+    saving:"儲存中…",
     notices:"請逐項閱讀",
     understand:"我知道了",
     understood:"已明白 ✓",
@@ -118,6 +134,22 @@ const T = {
     notFound:"We could not find that phone number.",
     error:"The service is temporarily unavailable. Please try again later.",
     participant:"Participant",
+    participantInfo:"Participant details",
+    name:"Name",
+    gender:"Sex",
+    age:"Age",
+    male:"Male",
+    female:"Female",
+    other:"Other",
+    profileTitle:"Additional information",
+    profileHelp:"Please confirm your height, weight and handedness for Tuen Mun Hospital registration.",
+    height:"Height (cm)",
+    weight:"Weight (kg)",
+    handedness:"Handedness",
+    right:"Right",
+    left:"Left",
+    saveContinue:"Save and continue",
+    saving:"Saving…",
     notices:"Please read each item",
     understand:"I understand",
     understood:"Understood ✓",
@@ -165,7 +197,7 @@ const app=document.querySelector("#app");
 const tr=key=>T[state.lang][key];
 
 function esc(value=""){const el=document.createElement("span");el.textContent=value==null?"":String(value);return el.innerHTML;}
-function setProgress(n){document.querySelector("#progress").textContent=n?`${tr("step")} ${n} / 4`:"";}
+function setProgress(n){document.querySelector("#progress").textContent=n?`${tr("step")} ${n} / 5`:"";}
 function translatePage(){document.documentElement.lang=state.lang==="zh"?"zh-Hant":"en";document.querySelectorAll("[data-text]").forEach(el=>el.textContent=tr(el.dataset.text));document.querySelector("#language").textContent=state.lang==="zh"?"English":"中文";}
 function splitSlot(value){const text=String(value||"").trim();const i=text.indexOf(" ");return i<0?{date:"",time:text}:{date:text.slice(0,i),time:text.slice(i+1)};}
 function dateLabel(value){const d=splitSlot(value).date;return d==="2026-10-04"?(state.lang==="zh"?"2026 年 10 月 4 日":"4 October 2026"):d;}
@@ -180,6 +212,23 @@ async function api(payload){
   return result;
 }
 
+function genderLabel(gender){
+  const value=String(gender||"").trim().toUpperCase();
+  if(value==="M") return tr("male");
+  if(value==="F") return tr("female");
+  return tr("other");
+}
+
+function participantSummary(){
+  const p=state.participant;
+  return `<div class="summary">
+    <div><strong>${tr("name")}</strong><br>${esc(p.name)}</div>
+    <div><strong>${tr("gender")}</strong><br>${esc(genderLabel(p.gender))}</div>
+    <div><strong>${tr("age")}</strong><br>${esc(p.age||"—")}</div>
+    <div><strong>${tr("phone")}</strong><br>${esc(p.phone||state.phone)}</div>
+  </div>`;
+}
+
 function renderPhone(error=""){
   state.step="phone";setProgress(1);
   app.innerHTML=`<h2>${tr("phoneTitle")}</h2><p class="muted">${tr("phoneHelp")}</p>${error?`<p class="error">${esc(error)}</p>`:""}<form id="phone-form"><label>${tr("phone")}</label><div class="phone"><select id="country"><option value="+852">+852 Hong Kong</option><option value="+86">+86 Mainland China</option></select><input id="phone" type="tel" inputmode="tel" autocomplete="tel" required></div><button type="submit">${tr("continue")}</button></form>`;
@@ -188,33 +237,153 @@ function renderPhone(error=""){
 
 async function lookup(e){
   e.preventDefault();
-  const btn=e.currentTarget.querySelector("button");btn.disabled=true;btn.textContent=tr("finding");
+  const btn=e.currentTarget.querySelector("button");
+  btn.disabled=true;
+  btn.textContent=tr("finding");
   state.phone=document.querySelector("#country").value+document.querySelector("#phone").value.replace(/\s+/g,"");
+
   try{
     const result=await api({action:"lookup",phone:state.phone});
     state.participant=result.participant;
-    if(state.participant.status==="COMPLETED"){setProgress(1);app.innerHTML=`<h2>${esc(state.participant.name)}</h2><div class="important">${tr("completed")}</div>`;return;}
-    if(state.participant.appointment){renderBookedResult(state.participant.appointment);return;}
-    if(state.participant.status==="WAITLIST"&&state.participant.waitlistPreference){renderWaitlist(planFromPreference(state.participant.waitlistPreference));return;}
-    state.noticesDone=0;renderNotices();
-  }catch(err){renderPhone(err.code==="NOT_FOUND"?tr("notFound"):tr("error"));}
+
+    if(state.participant.status==="COMPLETED"){
+      state.step="completed";
+      setProgress(1);
+      app.innerHTML=`<h2>${esc(state.participant.name)}</h2><div class="important">${tr("completed")}</div>`;
+      return;
+    }
+
+    if(state.participant.appointment){
+      renderBookedResult(state.participant.appointment);
+      return;
+    }
+
+    if(state.participant.status==="WAITLIST"&&state.participant.waitlistPreference){
+      renderWaitlist(planFromPreference(state.participant.waitlistPreference));
+      return;
+    }
+
+    renderProfile();
+  }catch(err){
+    renderPhone(err.code==="NOT_FOUND"?tr("notFound"):tr("error"));
+  }
+}
+
+function renderProfile(message=""){
+  state.step="profile";
+  setProgress(2);
+  const p=state.participant;
+
+  app.innerHTML=`
+    <h2>${tr("participantInfo")}</h2>
+    ${participantSummary()}
+
+    <section class="panel">
+      <h3>${tr("profileTitle")}</h3>
+      <p class="muted">${tr("profileHelp")}</p>
+      ${message?`<p class="error">${esc(message)}</p>`:""}
+
+      <form id="profile-form" class="profile-grid">
+        <label>${tr("height")}
+          <input id="height" type="number" min="100" max="250" step="0.1" value="${esc(p.height||"")}" required>
+        </label>
+
+        <label>${tr("weight")}
+          <input id="weight" type="number" min="20" max="300" step="0.1" value="${esc(p.weight||"")}" required>
+        </label>
+
+        <label>${tr("handedness")}
+          <select id="handedness" required>
+            <option value=""></option>
+            <option value="R" ${p.handedness==="R"?"selected":""}>${tr("right")}</option>
+            <option value="L" ${p.handedness==="L"?"selected":""}>${tr("left")}</option>
+          </select>
+        </label>
+
+        <button id="profile-save" type="submit">${tr("saveContinue")}</button>
+      </form>
+    </section>`;
+
+  document.querySelector("#profile-form").onsubmit=saveProfileAndContinue;
+}
+
+async function saveProfileAndContinue(event){
+  event.preventDefault();
+
+  const button=document.querySelector("#profile-save");
+  button.disabled=true;
+  button.textContent=tr("saving");
+
+  const height=document.querySelector("#height").value;
+  const weight=document.querySelector("#weight").value;
+  const handedness=document.querySelector("#handedness").value;
+
+  try{
+    const result=await api({
+      action:"updateProfile",
+      phone:state.phone,
+      height:height,
+      weight:weight,
+      handedness:handedness
+    });
+
+    state.participant.height=result.height;
+    state.participant.weight=result.weight;
+    state.participant.handedness=result.handedness;
+    state.noticesDone=0;
+    renderNotices();
+  }catch(err){
+    renderProfile(err.message||tr("error"));
+  }
 }
 
 function renderNotices(){
-  state.step="notices";setProgress(2);
-  app.innerHTML=`<div class="summary"><div><strong>${tr("participant")}</strong><br>${esc(state.participant.name)}</div></div><h2 style="margin-top:22px">${tr("notices")}</h2><div id="notices"></div>`;
+  state.step="notices";
+  setProgress(3);
+
+  app.innerHTML=`
+    ${participantSummary()}
+    <h2 style="margin-top:22px">${tr("notices")}</h2>
+    <div id="notices"></div>`;
+
   const list=document.querySelector("#notices");
-  NOTICES[state.lang].forEach((text,index)=>{const done=index<state.noticesDone;const unlocked=index<=state.noticesDone;list.insertAdjacentHTML("beforeend",`<div class="notice ${done?"done":unlocked?"":"locked"}"><p>${text}</p><button type="button" data-notice="${index}" ${unlocked&&!done?"":"disabled"}>${done?tr("understood"):tr("understand")}</button></div>`);});
-  if(state.noticesDone===NOTICES[state.lang].length)list.insertAdjacentHTML("beforeend",`<div class="actions"><button id="to-slots">${tr("continue")}</button></div>`);
-  list.onclick=e=>{if(e.target.hasAttribute("data-notice")){state.noticesDone++;renderNotices();}};
-  document.querySelector("#to-slots")?.addEventListener("click",renderSlots);
+
+  NOTICES[state.lang].forEach((text,index)=>{
+    const done=index<state.noticesDone;
+    const unlocked=index<=state.noticesDone;
+
+    list.insertAdjacentHTML("beforeend",
+      `<div class="notice ${done?"done":unlocked?"":"locked"}">
+        <p>${text}</p>
+        <button type="button" data-notice="${index}" ${unlocked&&!done?"":"disabled"}>
+          ${done?tr("understood"):tr("understand")}
+        </button>
+      </div>`);
+  });
+
+  if(state.noticesDone===NOTICES[state.lang].length){
+    list.insertAdjacentHTML("beforeend",
+      `<div class="actions"><button id="to-slots" type="button">${tr("continue")}</button></div>`);
+  }
+
+  list.onclick=event=>{
+    const button=event.target.closest("button[data-notice]");
+    if(!button||button.disabled) return;
+    state.noticesDone++;
+    renderNotices();
+  };
+
+  const continueButton=document.querySelector("#to-slots");
+  if(continueButton){
+    continueButton.onclick=()=>renderSlots();
+  }
 }
 
 function renderSlots(message=""){
-  state.step="slots";setProgress(3);
+  state.step="slots";setProgress(4);
   app.innerHTML=`<h2>${tr("choose")}</h2><p class="muted">${tr("chooseHelp")}</p>${message?`<p class="error">${esc(message)}</p>`:""}<div class="paired-choice-list">${Object.entries(PLAN).map(([id,p])=>`<button class="choice paired-choice ${state.slotId===id?"selected":""}" type="button" data-slot="${id}"><strong>${orderLabel(p.order)}</strong><span>${p.order==="POLYU_FIRST"?`理工 ${esc(splitSlot(p.polyuTime).time)}　→　屯門 ${esc(splitSlot(p.tmhTime).time)}`:`屯門 ${esc(splitSlot(p.tmhTime).time)}　→　理工 ${esc(splitSlot(p.polyuTime).time)}`}</span></button>`).join("")}</div><div class="actions"><button class="secondary" id="back">${tr("back")}</button><button id="book">${tr("book")}</button></div>`;
   app.querySelectorAll("[data-slot]").forEach(btn=>btn.onclick=()=>{state.slotId=btn.dataset.slot;renderSlots();});
-  document.querySelector("#back").onclick=renderNotices;
+  document.querySelector("#back").onclick=()=>renderNotices();
   document.querySelector("#book").onclick=submitBooking;
 }
 
@@ -229,7 +398,7 @@ async function submitBooking(e){
 }
 
 function renderWaitlist(plan){
-  state.step="waitlist";setProgress(4);
+  state.step="waitlist";setProgress(5);
   const p=plan||planFromPreference(state.participant.waitlistPreference);
   app.innerHTML=`<h2>${tr("waitlistTitle")}</h2><div class="important"><strong>${tr("waitlistBody")}</strong></div>${p?`<div class="appointment"><strong>${orderLabel(p.order)}</strong><p>${p.order==="POLYU_FIRST"?`理工 ${esc(splitSlot(p.polyuTime).time)} → 屯門 ${esc(splitSlot(p.tmhTime).time)}`:`屯門 ${esc(splitSlot(p.tmhTime).time)} → 理工 ${esc(splitSlot(p.polyuTime).time)}`}</p></div>`:""}<div class="actions"><a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a></div>`;
 }
@@ -239,15 +408,15 @@ function resultCard(site,value,note,cls){
 }
 
 function renderBookedResult(a){
-  state.step="booked";setProgress(4);
+  state.step="booked";setProgress(5);
   const firstPolyu=a.order!=="TMH_FIRST";
   const cards=firstPolyu?resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed")+resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital"):resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital")+resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed");
-  app.innerHTML=`<h2 class="success">${tr("bookedTitle")}</h2><div class="important"><strong>${tr("bookedWarning")}</strong></div><div class="summary"><div><strong>${tr("participant")}</strong><br>${esc(state.participant.name)}</div><div><strong>${tr("order")}</strong><br>${orderLabel(a.order)}</div></div>${cards}<address><strong>${tr("polyu")}</strong><br>Z座地下二樓 ZB217<br>UBSN 神經科學實驗室<br>${tr("contact")}</address><address><strong>${tr("tmh")}</strong><br>主座地下放射科（X光部門）<br>新界屯門青松觀路23號<br>${tr("contact")}</address><section class="panel"><h3>${tr("routes")}</h3><div class="actions"><a class="button-link" href="${FILES.polyuGuide}" target="_blank" rel="noopener">${tr("polyuRoute")}</a><a class="button-link" href="${FILES.tmhGuide}" target="_blank" rel="noopener">${tr("tmhRoute")}</a></div></section><section class="preparation"><h3>${tr("preparation")}</h3><ul>${tr("prep").map(x=>`<li>${x}</li>`).join("")}</ul></section><section class="incentive"><h3>${tr("incentive")}</h3><p><strong>${tr("incentiveText")}</strong></p></section><section class="panel"><h3>${tr("docs")}</h3><div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">${state.lang==="zh"?"參加者須知":"Information sheet"}</a><a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${state.lang==="zh"?"同意書":"Consent form"}</a></div></section>${a.qr?`<div class="qr"><h3>${tr("qr")}</h3><img src="${esc(a.qr)}" alt="Campus entry QR code"><a class="button-link" href="${esc(a.qr)}" target="_blank" rel="noopener">${tr("qrSave")}</a></div>`:""}`;
+  app.innerHTML=`<h2 class="success">${tr("bookedTitle")}</h2><div class="important"><strong>${tr("bookedWarning")}</strong></div>${participantSummary()}<div class="summary"><div><strong>${tr("order")}</strong><br>${orderLabel(a.order)}</div></div>${cards}<address><strong>${tr("polyu")}</strong><br>Z座地下二樓 ZB217<br>UBSN 神經科學實驗室<br>${tr("contact")}</address><address><strong>${tr("tmh")}</strong><br>主座地下放射科（X光部門）<br>新界屯門青松觀路23號<br>${tr("contact")}</address><section class="panel"><h3>${tr("routes")}</h3><div class="actions"><a class="button-link" href="${FILES.polyuGuide}" target="_blank" rel="noopener">${tr("polyuRoute")}</a><a class="button-link" href="${FILES.tmhGuide}" target="_blank" rel="noopener">${tr("tmhRoute")}</a></div></section><section class="preparation"><h3>${tr("preparation")}</h3><ul>${tr("prep").map(x=>`<li>${x}</li>`).join("")}</ul></section><section class="incentive"><h3>${tr("incentive")}</h3><p><strong>${tr("incentiveText")}</strong></p></section><section class="panel"><h3>${tr("docs")}</h3><div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">${state.lang==="zh"?"參加者須知":"Information sheet"}</a><a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${state.lang==="zh"?"同意書":"Consent form"}</a></div></section>${a.qr?`<div class="qr"><h3>${tr("qr")}</h3><img src="${esc(a.qr)}" alt="Campus entry QR code"><a class="button-link" href="${esc(a.qr)}" target="_blank" rel="noopener">${tr("qrSave")}</a></div>`:""}`;
 }
 
 document.addEventListener("keydown",event=>{if(event.key!=="Enter"||state.step!=="notices")return;const tag=(event.target&&event.target.tagName||"").toUpperCase();if(["A","BUTTON","INPUT","SELECT","TEXTAREA"].includes(tag))return;const next=document.querySelector('#notices button[data-notice]:not([disabled])');const cont=document.querySelector("#to-slots");if(next){event.preventDefault();next.click();}else if(cont){event.preventDefault();cont.click();}});
 
-document.querySelector("#language").onclick=()=>{state.lang=state.lang==="zh"?"en":"zh";translatePage();const render={phone:renderPhone,notices:renderNotices,slots:renderSlots,waitlist:()=>renderWaitlist(),booked:()=>renderBookedResult(state.participant.appointment)}[state.step];if(render)render();};
+document.querySelector("#language").onclick=()=>{state.lang=state.lang==="zh"?"en":"zh";translatePage();const render={phone:renderPhone,profile:renderProfile,notices:renderNotices,slots:renderSlots,waitlist:()=>renderWaitlist(),booked:()=>renderBookedResult(state.participant.appointment)}[state.step];if(render)render();};
 
 translatePage();
 renderPhone();
