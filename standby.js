@@ -24,9 +24,8 @@ const PLAN = {
 
 const NOTICES = {
   zh:[
-    `請先閱讀完整的<strong>《參加者須知》</strong>，並閱讀同意書。<br><br><strong>MRI 意外發現是什麼？</strong><br>MRI 意外發現是指研究掃描中偶然發現可能需要進一步醫療評估的異常，例如疑似<strong>腦出血、中風、腫瘤</strong>或其他明顯異常。研究 MRI 並不是正式的臨床診斷檢查，也不會提供常規影像報告。<br><br>如果你勾選<strong>「希望得到通知」</strong>：若研究人員在影像中發現可能具有臨床意義的異常，我們會在發現後聯絡你。<br><br>如果你勾選<strong>「不希望得到通知」</strong>：即使研究影像中發現可能的異常，我們也不會因本研究的影像結果主動通知你。<br><br>如果正式確認參加，請在同意書中選擇其中一項，並填寫姓名、簽署及日期。<div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">參加者須知</a><a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">同意書</a></div>`,
     "你需要在<strong>同一天</strong>完成香港理工大學及屯門醫院兩次 MRI 掃描。",
-    "兩個地點的<strong>掃描時間均為固定時間</strong>；請從提供的固定配對安排中選擇一個。",
+    "兩個地點的<strong>掃描時間均為固定時間</strong>；請從目前仍有空缺的固定配對安排中選擇一個。",
     "兩個地點都建議在<strong>掃描時間前約 30 分鐘到達</strong>。",
     "掃描前請保持<strong>至少 2 小時未進食</strong>。",
     "掃描當天<strong>請勿吸煙、飲酒、飲用咖啡或茶</strong>，並避免能量飲品及其他含咖啡因產品。",
@@ -35,12 +34,11 @@ const NOTICES = {
     "掃描前 3 天請盡量避免不必要的藥物。如因醫療需要必須服藥，請按醫生指示正常服用，<strong>不要自行停藥</strong>，並告知研究團隊藥物名稱及劑量。",
     "香港理工大學與屯門醫院之間請預留約 <strong>1–1.5 小時</strong>公共交通時間。",
     "到達香港理工大學或屯門醫院後，請直接<strong>致電或 WhatsApp 91230084</strong>。屯門醫院請在主座地下放射科（X光部門）門口等候工作人員。",
-    `完成兩次掃描後可獲 <strong>HK$${INCENTIVE_AMOUNT}</strong> 研究參與津貼；津貼只發放一次。`
+    "完成兩次掃描後可獲 <strong>HK$200</strong> 研究參與津貼；津貼只發放一次。"
   ],
   en:[
-    `Please read the full <strong>Participant Information Sheet</strong> and the consent form.<br><br><strong>What is an incidental MRI finding?</strong><br>This is an unexpected abnormality seen during the research scan that may need further medical assessment, for example suspected <strong>brain haemorrhage, stroke, tumour</strong>, or another obvious abnormality. Research MRI is not a formal clinical diagnostic examination and does not provide a routine radiology report.<br><br>If you choose <strong>“I wish to be notified”</strong>, we will contact you if a potentially clinically significant abnormality is identified. If you choose <strong>“I do not wish to be notified”</strong>, we will not proactively notify you on the basis of the research images even if a possible abnormality is seen.<div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">Information sheet</a><a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">Consent form</a></div>`,
     "Both MRI scans must be completed on the <strong>same day</strong>.",
-    "The scan times at <strong>both sites are fixed</strong>. Choose one of the paired arrangements below.",
+    "The scan times at <strong>both sites are fixed</strong>. Choose one of the paired arrangements that is still available.",
     "Please arrive about <strong>30 minutes before each scan</strong>.",
     "Do not eat for at least <strong>2 hours</strong> before scanning.",
     "On the scan day, <strong>do not smoke or drink alcohol, coffee or tea</strong>, and avoid energy drinks and other caffeinated products.",
@@ -49,7 +47,7 @@ const NOTICES = {
     "Avoid unnecessary medication for 3 days where possible. Take medically necessary medication as directed and do not stop prescribed medication on your own. Tell the study team the name and dose.",
     "Allow approximately <strong>1–1.5 hours</strong> for public transport between PolyU and Tuen Mun Hospital.",
     "On arrival at either site, <strong>call or WhatsApp 91230084</strong>. At Tuen Mun Hospital, wait outside Radiology (X-ray) on the ground floor of the Main Block.",
-    `After completing both scans, you will receive one <strong>HK$${INCENTIVE_AMOUNT}</strong> study participation incentive.`
+    "After completing both scans, you will receive one <strong>HK$200</strong> study participation incentive."
   ]
 };
 
@@ -117,7 +115,8 @@ const T = {
     ],
     incentive:"研究參與津貼",
     incentiveText:"完成兩次掃描後可獲 HK$200，津貼只發放一次。",
-    docs:"研究文件",
+    docs:"研究文件及同意書",
+    docsSend:"請閱讀參加者須知，填妥同意書（包括意外發現通知選項、姓名、簽署及日期），完成後將清晰照片或 PDF 透過 WhatsApp 發送至 91230084。",
     qr:"PolyU 校園入場二維碼",
     qrSave:"查看／儲存二維碼",
     completed:"你已完成本研究，謝謝參與。"
@@ -185,14 +184,15 @@ const T = {
     ],
     incentive:"Study participation incentive",
     incentiveText:"You will receive HK$200 after completing both scans. It is paid once.",
-    docs:"Study documents",
+    docs:"Study documents and consent",
+    docsSend:"Please read the Participant Information Sheet, complete the consent form including the incidental-finding notification choice, name, signature and date, then send a clear photo or PDF by WhatsApp to 91230084.",
     qr:"PolyU campus entry QR code",
     qrSave:"View / save QR code",
     completed:"You have completed the study. Thank you."
   }
 };
 
-const state={lang:"zh",step:"phone",phone:"",participant:null,noticesDone:0,slotId:""};
+const state={lang:"zh",step:"phone",phone:"",participant:null,noticesDone:0,slotId:"",openSlots:[]};
 const app=document.querySelector("#app");
 const tr=key=>T[state.lang][key];
 
@@ -245,6 +245,7 @@ async function lookup(e){
   try{
     const result=await api({action:"lookup",phone:state.phone});
     state.participant=result.participant;
+    state.openSlots=Array.isArray(result.openSlots)?result.openSlots:[];
 
     if(state.participant.status==="COMPLETED"){
       state.step="completed";
@@ -258,8 +259,16 @@ async function lookup(e){
       return;
     }
 
-    if(state.participant.status==="WAITLIST"&&state.participant.waitlistPreference){
+    if(state.participant.status==="WAITLIST"){
       renderWaitlist(planFromPreference(state.participant.waitlistPreference));
+      return;
+    }
+
+    if(state.openSlots.length===0){
+      await api({action:"joinWaitlist",phone:state.phone});
+      state.participant.status="WAITLIST";
+      state.participant.waitlistPreference="ANY";
+      renderWaitlist(null);
       return;
     }
 
@@ -380,9 +389,36 @@ function renderNotices(){
 }
 
 function renderSlots(message=""){
-  state.step="slots";setProgress(4);
-  app.innerHTML=`<h2>${tr("choose")}</h2><p class="muted">${tr("chooseHelp")}</p>${message?`<p class="error">${esc(message)}</p>`:""}<div class="paired-choice-list">${Object.entries(PLAN).map(([id,p])=>`<button class="choice paired-choice ${state.slotId===id?"selected":""}" type="button" data-slot="${id}"><strong>${orderLabel(p.order)}</strong><span>${p.order==="POLYU_FIRST"?`理工 ${esc(splitSlot(p.polyuTime).time)}　→　屯門 ${esc(splitSlot(p.tmhTime).time)}`:`屯門 ${esc(splitSlot(p.tmhTime).time)}　→　理工 ${esc(splitSlot(p.polyuTime).time)}`}</span></button>`).join("")}</div><div class="actions"><button class="secondary" id="back">${tr("back")}</button><button id="book">${tr("book")}</button></div>`;
-  app.querySelectorAll("[data-slot]").forEach(btn=>btn.onclick=()=>{state.slotId=btn.dataset.slot;renderSlots();});
+  state.step="slots";
+  setProgress(4);
+
+  const options=Object.entries(PLAN).filter(([id])=>state.openSlots.includes(id));
+
+  app.innerHTML=`
+    <h2>${tr("choose")}</h2>
+    <p class="muted">${tr("chooseHelp")}</p>
+    ${message?`<p class="error">${esc(message)}</p>`:""}
+    <div class="paired-choice-list">
+      ${options.map(([id,p])=>`
+        <button class="choice paired-choice ${state.slotId===id?"selected":""}" type="button" data-slot="${id}">
+          <strong>${orderLabel(p.order)}</strong>
+          <span>${p.order==="POLYU_FIRST"
+            ?`理工 ${esc(splitSlot(p.polyuTime).time)}　→　屯門 ${esc(splitSlot(p.tmhTime).time)}`
+            :`屯門 ${esc(splitSlot(p.tmhTime).time)}　→　理工 ${esc(splitSlot(p.polyuTime).time)}`}</span>
+        </button>`).join("")}
+    </div>
+    <div class="actions">
+      <button class="secondary" id="back" type="button">${tr("back")}</button>
+      <button id="book" type="button">${tr("book")}</button>
+    </div>`;
+
+  app.querySelectorAll("[data-slot]").forEach(btn=>{
+    btn.onclick=()=>{
+      state.slotId=btn.dataset.slot;
+      renderSlots();
+    };
+  });
+
   document.querySelector("#back").onclick=()=>renderNotices();
   document.querySelector("#book").onclick=submitBooking;
 }
@@ -408,15 +444,78 @@ function resultCard(site,value,note,cls){
 }
 
 function renderBookedResult(a){
-  state.step="booked";setProgress(5);
+  state.step="booked";
+  setProgress(5);
+
   const firstPolyu=a.order!=="TMH_FIRST";
-  const cards=firstPolyu?resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed")+resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital"):resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital")+resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed");
-  app.innerHTML=`<h2 class="success">${tr("bookedTitle")}</h2><div class="important"><strong>${tr("bookedWarning")}</strong></div>${participantSummary()}<div class="summary"><div><strong>${tr("order")}</strong><br>${orderLabel(a.order)}</div></div>${cards}<address><strong>${tr("polyu")}</strong><br>Z座地下二樓 ZB217<br>UBSN 神經科學實驗室<br>${tr("contact")}</address><address><strong>${tr("tmh")}</strong><br>主座地下放射科（X光部門）<br>新界屯門青松觀路23號<br>${tr("contact")}</address><section class="panel"><h3>${tr("routes")}</h3><div class="actions"><a class="button-link" href="${FILES.polyuGuide}" target="_blank" rel="noopener">${tr("polyuRoute")}</a><a class="button-link" href="${FILES.tmhGuide}" target="_blank" rel="noopener">${tr("tmhRoute")}</a></div></section><section class="preparation"><h3>${tr("preparation")}</h3><ul>${tr("prep").map(x=>`<li>${x}</li>`).join("")}</ul></section><section class="incentive"><h3>${tr("incentive")}</h3><p><strong>${tr("incentiveText")}</strong></p></section><section class="panel"><h3>${tr("docs")}</h3><div class="actions"><a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">${state.lang==="zh"?"參加者須知":"Information sheet"}</a><a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${state.lang==="zh"?"同意書":"Consent form"}</a></div></section>${a.qr?`<div class="qr"><h3>${tr("qr")}</h3><img src="${esc(a.qr)}" alt="Campus entry QR code"><a class="button-link" href="${esc(a.qr)}" target="_blank" rel="noopener">${tr("qrSave")}</a></div>`:""}`;
+  const cards=firstPolyu
+    ?resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed")+resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital")
+    :resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital")+resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed");
+
+  app.innerHTML=`
+    <h2 class="success">${tr("bookedTitle")}</h2>
+    <div class="important"><strong>${tr("bookedWarning")}</strong></div>
+
+    ${participantSummary()}
+
+    <div class="summary">
+      <div><strong>${tr("order")}</strong><br>${orderLabel(a.order)}</div>
+    </div>
+
+    ${cards}
+
+    <address>
+      <strong>${tr("polyu")}</strong><br>
+      Z座地下二樓 ZB217<br>
+      UBSN 神經科學實驗室<br>
+      ${tr("contact")}
+    </address>
+
+    <address>
+      <strong>${tr("tmh")}</strong><br>
+      主座地下放射科（X光部門）<br>
+      新界屯門青松觀路23號<br>
+      ${tr("contact")}
+    </address>
+
+    <section class="panel">
+      <h3>${tr("routes")}</h3>
+      <div class="actions">
+        <a class="button-link" href="${FILES.polyuGuide}" target="_blank" rel="noopener">${tr("polyuRoute")}</a>
+        <a class="button-link" href="${FILES.tmhGuide}" target="_blank" rel="noopener">${tr("tmhRoute")}</a>
+      </div>
+    </section>
+
+    <section class="preparation">
+      <h3>${tr("preparation")}</h3>
+      <ul>${tr("prep").map(x=>`<li>${x}</li>`).join("")}</ul>
+    </section>
+
+    <section class="incentive">
+      <h3>${tr("incentive")}</h3>
+      <p><strong>${tr("incentiveText")}</strong></p>
+    </section>
+
+    ${a.qr?`<div class="qr">
+      <h3>${tr("qr")}</h3>
+      <img src="${esc(a.qr)}" alt="Campus entry QR code">
+      <a class="button-link" href="${esc(a.qr)}" target="_blank" rel="noopener">${tr("qrSave")}</a>
+    </div>`:""}
+
+    <section class="panel">
+      <h3>${tr("docs")}</h3>
+      <p>${tr("docsSend")}</p>
+      <div class="actions">
+        <a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">${state.lang==="zh"?"參加者須知":"Information sheet"}</a>
+        <a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${state.lang==="zh"?"同意書":"Consent form"}</a>
+        <a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a>
+      </div>
+    </section>`;
 }
 
 document.addEventListener("keydown",event=>{if(event.key!=="Enter"||state.step!=="notices")return;const tag=(event.target&&event.target.tagName||"").toUpperCase();if(["A","BUTTON","INPUT","SELECT","TEXTAREA"].includes(tag))return;const next=document.querySelector('#notices button[data-notice]:not([disabled])');const cont=document.querySelector("#to-slots");if(next){event.preventDefault();next.click();}else if(cont){event.preventDefault();cont.click();}});
 
-document.querySelector("#language").onclick=()=>{state.lang=state.lang==="zh"?"en":"zh";translatePage();const render={phone:renderPhone,profile:renderProfile,notices:renderNotices,slots:renderSlots,waitlist:()=>renderWaitlist(),booked:()=>renderBookedResult(state.participant.appointment)}[state.step];if(render)render();};
+document.querySelector("#language").onclick=()=>{state.lang=state.lang==="zh"?"en":"zh";translatePage();const render={phone:renderPhone,profile:renderProfile,notices:renderNotices,slots:()=>renderSlots(),waitlist:()=>renderWaitlist(),booked:()=>renderBookedResult(state.participant.appointment)}[state.step];if(render)render();};
 
 translatePage();
 renderPhone();
