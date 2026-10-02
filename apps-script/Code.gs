@@ -24,7 +24,7 @@ const STANDBY_SLOTS = {
 function doPost(e) {
   try {
     const request = JSON.parse(e.postData.contents || "{}");
-    const handlers = { lookup: lookup_, updateProfile: updateProfile_, standbySignup: standbySignup_ };
+    const handlers = { lookup: lookup_, updateProfile: updateProfile_, standbySignup: standbySignup_, standbySelect: standbySelect_ };
     if (!handlers[request.action]) fail_("BAD_REQUEST","Unknown action");
     return json_(Object.assign({ok:true}, handlers[request.action](request)));
   } catch (error) {
