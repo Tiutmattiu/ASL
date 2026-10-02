@@ -12,7 +12,6 @@ const REQUIRED_HEADERS = [
 const STANDBY_HEADERS = ["Standby preferences","Standby timestamp","Standby information acknowledged"];
 
 const STANDBY_SLOTS = {
-  "A": "屯門醫院 10:30–11:00 → 香港理工大學 12:30–13:00",
   "B": "香港理工大學 13:00–13:30 → 屯門醫院 15:00–15:30",
   "C": "屯門醫院 13:00–13:30 → 香港理工大學 16:00–16:30",
   "D": "屯門醫院 13:30–14:00 → 香港理工大學 16:30–17:00",
