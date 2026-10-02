@@ -40,18 +40,14 @@ function doPost(e) {
     if (!handlers[request.action]) fail_("BAD_REQUEST","Unknown action");
     return json_(Object.assign({ok:true}, handlers[request.action](request)));
   } catch (error) {
-    return json_({
-      ok:false,
-      code:error.code || "SERVER_ERROR",
-      message:error.message || String(error)
-    });
+    return json_({ok:false,code:error.code || "SERVER_ERROR",message:error.message || String(error)});
   }
 }
 
 function lookup_(request) {
   const participant = findParticipant_(request.phone);
   if (!participant) fail_("NOT_FOUND","Phone number not found");
-  return { participant: publicParticipant_(participant) };
+  return {participant:publicParticipant_(participant)};
 }
 
 function updateProfile_(request) {
@@ -62,11 +58,9 @@ function updateProfile_(request) {
 
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(10000)) fail_("BUSY","Sheet is busy; please try again");
-
   try {
     const participant = findParticipant_(request.phone);
     if (!participant) fail_("NOT_FOUND","Phone number not found");
-
     const ctx = sheetContext_();
     setByHeader_(ctx.sheet,participant.row,ctx.map,"height",height);
     setByHeader_(ctx.sheet,participant.row,ctx.map,"weight",weight);
@@ -81,7 +75,6 @@ function bookReplacement_(request) {
   const phone = normalizePhone_(request.phone);
   const slotId = String(request.slotId || "").trim();
   const slot = REPLACEMENT_SLOTS[slotId];
-
   if (!phone) fail_("BAD_PHONE","Valid phone number is required");
   if (!slot) fail_("BAD_SLOT","Invalid slot");
   if (request.acknowledged !== true) fail_("NOT_ACKNOWLEDGED","Instructions must be acknowledged");
@@ -95,15 +88,14 @@ function bookReplacement_(request) {
     if (participant.status === "COMPLETED") fail_("COMPLETED","Participant already completed the study");
 
     if (participant.status === "BOOKED" && participant.polyuTime) {
-      return {
-        booked:true,
-        waitlisted:false,
-        appointment:appointmentFromParticipant_(participant)
-      };
+      return {booked:true,waitlisted:false,appointment:appointmentFromParticipant_(participant)};
     }
 
     const ctx = sheetContext_();
-    const values = ctx.sheet.getRange(2,1,Math.max(ctx.sheet.getLastRow()-1,1),ctx.sheet.getLastColumn()).getDisplayValues();
+    const lastRow = ctx.sheet.getLastRow();
+    const values = lastRow >= 2
+      ? ctx.sheet.getRange(2,1,lastRow-1,ctx.sheet.getLastColumn()).getDisplayValues()
+      : [];
 
     let taken = false;
     for (let i=0;i<values.length;i++) {
@@ -124,12 +116,7 @@ function bookReplacement_(request) {
       setByHeader_(ctx.sheet,participant.row,ctx.map,"Standby timestamp",new Date());
       clearAppointment_(ctx.sheet,participant.row,ctx.map);
       SpreadsheetApp.flush();
-      return {
-        booked:false,
-        waitlisted:true,
-        slotId,
-        preference:slotId + ": " + slot.label
-      };
+      return {booked:false,waitlisted:true,slotId:slotId,preference:slotId + ": " + slot.label};
     }
 
     setByHeader_(ctx.sheet,participant.row,ctx.map,"Status","BOOKED");
@@ -148,21 +135,15 @@ function bookReplacement_(request) {
     SpreadsheetApp.flush();
 
     participant = findParticipant_(phone);
-    return {
-      booked:true,
-      waitlisted:false,
-      appointment:appointmentFromParticipant_(participant)
-    };
+    return {booked:true,waitlisted:false,appointment:appointmentFromParticipant_(participant)};
   } finally {
     lock.releaseLock();
   }
 }
 
 function clearAppointment_(sheet,row,map) {
-  [
-    "PolyU MRI time","TMH suggested arrival","Appointment order",
-    "Incentive site","Campus QR","Booking timestamp","Instructions acknowledged"
-  ].forEach(header => setByHeader_(sheet,row,map,header,""));
+  ["PolyU MRI time","TMH suggested arrival","Appointment order","Incentive site","Campus QR","Booking timestamp","Instructions acknowledged"]
+    .forEach(header => setByHeader_(sheet,row,map,header,""));
   setByHeader_(sheet,row,map,"PolyU scan completed",false);
   setByHeader_(sheet,row,map,"TMH scan completed",false);
   setByHeader_(sheet,row,map,"Incentive paid",false);
@@ -171,7 +152,6 @@ function clearAppointment_(sheet,row,map) {
 function sheetContext_() {
   const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
   if (!sheet) fail_("SHEET_NOT_FOUND",SHEET_NAME + " was not found");
-
   const lastColumn = sheet.getLastColumn();
   const headers = sheet.getRange(1,1,1,lastColumn).getDisplayValues()[0];
   const map = {};
@@ -185,11 +165,9 @@ function sheetContext_() {
 function findParticipant_(phone) {
   const wanted = normalizePhone_(phone);
   if (!wanted) return null;
-
   const ctx = sheetContext_();
   const lastRow = ctx.sheet.getLastRow();
   if (lastRow < 2) return null;
-
   const values = ctx.sheet.getRange(2,1,lastRow-1,ctx.sheet.getLastColumn()).getDisplayValues();
   for (let i=0;i<values.length;i++) {
     if (normalizePhone_(get_(values[i],ctx.map,"Phone")) !== wanted) continue;
@@ -243,8 +221,7 @@ function publicParticipant_(p) {
 }
 
 function inferOrder_(polyu,tmh) {
-  const a = parseStart_(polyu);
-  const b = parseStart_(tmh);
+  const a = parseStart_(polyu), b = parseStart_(tmh);
   if (!a || !b) return "";
   return a.getTime() < b.getTime() ? "POLYU_FIRST" : "TMH_FIRST";
 }
@@ -274,8 +251,7 @@ function parseStart_(slot) {
   return Utilities.parseDate(
     m[1] + "-" + String(m[2]).padStart(2,"0") + "-" + String(m[3]).padStart(2,"0") +
     " " + String(m[4]).padStart(2,"0") + ":" + m[5],
-    TIME_ZONE,
-    "yyyy-MM-dd HH:mm"
+    TIME_ZONE,"yyyy-MM-dd HH:mm"
   );
 }
 
@@ -295,8 +271,7 @@ function number_(value) {
 }
 
 function json_(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
 }
 
 function fail_(code,message) {
