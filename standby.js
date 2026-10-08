@@ -328,7 +328,11 @@ async function lookup(event) {
   try {
     const result=await api({action:"lookup",phone:state.phone});
     state.participant=result.participant;
-    state.openSlots=Array.isArray(result.openSlots)?result.openSlots:[];
+    if(!Array.isArray(result.openSlots)){
+      renderBackendMismatch();
+      return;
+    }
+    state.openSlots=result.openSlots;
     state.choice="";
 
     if(state.participant.status==="COMPLETED") {
@@ -357,6 +361,17 @@ async function lookup(event) {
   } catch(err) {
     renderPhone(err.code==="NOT_FOUND"?tr("notFound"):tr("error"));
   }
+}
+
+function renderBackendMismatch(){
+  state.step="backendMismatch";
+  setProgress(1);
+  app.innerHTML=`
+    <h2>${state.lang==="zh"?"系統暫時無法確認預約空位":"Booking availability cannot be verified"}</h2>
+    <div class="important">${state.lang==="zh"
+      ?"預約資料尚未與最新系統同步。這不代表時段已滿；請稍後再試或聯絡研究團隊。"
+      :"The booking page is not receiving current availability data. This does not mean that the slots are full. Please try again later or contact the study team."}</div>
+    <div class="actions"><a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a></div>`;
 }
 
 function renderProfile(message="") {
@@ -703,6 +718,7 @@ document.querySelector("#language").onclick=()=>{
     profile:()=>renderProfile(),
     notices:()=>renderNotices(),
     choices:()=>renderChoices(),
+    backendMismatch:()=>renderBackendMismatch(),
     waitlist:()=>renderWaitlist(null,false),
     unavailable:()=>renderUnavailable(),
     booked:()=>renderBookedResult(state.participant.appointment)
