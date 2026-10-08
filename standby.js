@@ -1,5 +1,3 @@
-const INCENTIVE_AMOUNT = 200;
-
 const FILES = {
   info:"assets/participant-information-sheet.pdf",
   consent:"assets/consent-form.pdf",
@@ -8,9 +6,19 @@ const FILES = {
 };
 
 const PLAN = {
-  B:{
-    polyuTime:"2026-10-04 13:00–13:30",
-    tmhTime:"2026-10-04 15:00–15:30",
+  N1:{
+    polyuTime:"2026-11-01 09:00–09:30",
+    tmhTime:"2026-11-01 11:00–11:30",
+    order:"POLYU_FIRST"
+  },
+  N2:{
+    polyuTime:"2026-11-01 09:30–10:00",
+    tmhTime:"2026-11-01 11:30–12:00",
+    order:"POLYU_FIRST"
+  },
+  N3:{
+    polyuTime:"2026-11-01 12:00–12:30",
+    tmhTime:"2026-11-01 14:00–14:30",
     order:"POLYU_FIRST"
   }
 };
@@ -18,7 +26,7 @@ const PLAN = {
 const NOTICES = {
   zh:[
     "你需要在<strong>同一天</strong>完成香港理工大學及屯門醫院兩次 MRI 掃描。",
-    "目前只有一個 10 月 4 日空缺：<strong>香港理工大學 13:00–13:30 → 屯門醫院 15:00–15:30</strong>。",
+    "目前提供的是<strong>2026 年 11 月 1 日</strong>的固定配對時段；只會顯示仍有空缺的安排。",
     "兩個地點都建議在<strong>掃描時間前約 30 分鐘到達</strong>。",
     "掃描前請保持<strong>至少 2 小時未進食</strong>。",
     "掃描當天<strong>請勿吸煙、飲酒、飲用咖啡或茶</strong>，並避免能量飲品及其他含咖啡因產品。",
@@ -31,7 +39,7 @@ const NOTICES = {
   ],
   en:[
     "Both MRI scans must be completed on the <strong>same day</strong>.",
-    "There is currently one opening on 4 October: <strong>PolyU 13:00–13:30 → Tuen Mun Hospital 15:00–15:30</strong>.",
+    "The currently offered fixed paired slots are on <strong>1 November 2026</strong>. Only arrangements that are still available will be shown.",
     "Please arrive about <strong>30 minutes before each scan</strong>.",
     "Do not eat for at least <strong>2 hours</strong> before scanning.",
     "On the scan day, <strong>do not smoke or drink alcohol, coffee or tea</strong>, and avoid energy drinks and other caffeinated products.",
@@ -75,26 +83,22 @@ const T = {
     notices:"請逐項閱讀",
     understand:"我知道了",
     understood:"已明白 ✓",
-    choose:"選擇安排",
-    chooseHelp:"請選擇真正適合你的安排，不需要勉強選擇 10 月 4 日。",
-    oct4Choice:"10 月 4 日正式預約",
-    oct4Help:"理工 13:00–13:30 → 屯門 15:00–15:30",
-    oct10Choice:"候補 10 月 10 日掃描",
-    oct10Help:"如 10 月 10 日有合適空缺，研究團隊會再聯絡你確認具體時間。",
-    unavailableChoice:"以上日期都不方便",
-    unavailableHelp:"不建立目前預約或候補；只記錄這個選擇。",
-    submitChoice:"提交選擇",
+    choose:"選擇 11 月 1 日掃描安排",
+    chooseHelp:"只顯示目前仍有空缺的時段；如果都不方便，可以直接選擇「以上時段都不方便」。",
+    unavailableChoice:"以上時段都不方便",
+    unavailableHelp:"不建立預約；只記錄這個選擇。",
+    submitChoice:"確認選擇",
     back:"返回",
     needChoice:"請先選擇一項。",
     processing:"正在處理…",
     bookedTitle:"預約成功",
-    bookedWarning:"你的掃描時間已正式確認。",
-    waitlistTitle:"已加入 10 月 4 日候補名單",
-    waitlistBody:"這個 10 月 4 日時段剛剛已被其他參加者預約。你已加入該時段候補名單；如有空缺，研究團隊會聯絡你。",
-    oct10WaitlistTitle:"已加入 10 月 10 日候補名單",
-    oct10WaitlistBody:"如 10 月 10 日出現合適空缺，研究團隊會聯絡你確認具體掃描時間。未收到確認前請勿自行前往。",
+    bookedWarning:"你的 11 月 1 日掃描時間已正式確認。",
+    waitlistTitle:"目前 11 月 1 日空缺已被選走",
+    waitlistBody:"你仍保留在候補名單中；如 11 月 1 日再出現合適空缺，研究團隊會聯絡你。未收到確認前請勿自行前往。",
+    raceWaitlistTitle:"已加入該時段候補",
+    raceWaitlistBody:"你剛選擇的時段已被其他參加者先一步確認。你已保留在該時段候補名單中；如有空缺，研究團隊會聯絡你。",
     unavailableTitle:"已記錄",
-    unavailableBody:"已記錄目前提供的日期都不方便，不會為你建立預約或候補時段。",
+    unavailableBody:"已記錄 11 月 1 日目前提供的時段都不方便，不會為你建立預約。",
     order:"掃描順序",
     polyu:"香港理工大學 UBSN",
     tmh:"屯門醫院",
@@ -153,26 +157,22 @@ const T = {
     notices:"Please read each item",
     understand:"I understand",
     understood:"Understood ✓",
-    choose:"Choose an arrangement",
-    chooseHelp:"Choose what actually works for you. You do not need to select 4 October.",
-    oct4Choice:"Confirm 4 October booking",
-    oct4Help:"PolyU 13:00–13:30 → Tuen Mun Hospital 15:00–15:30",
-    oct10Choice:"Waitlist for 10 October",
-    oct10Help:"If a suitable place becomes available on 10 October, the study team will contact you to confirm the exact time.",
-    unavailableChoice:"None of these dates work",
-    unavailableHelp:"No current booking or waitlist place will be created; we will only record this choice.",
-    submitChoice:"Submit choice",
+    choose:"Choose a 1 November scan arrangement",
+    chooseHelp:"Only currently available slots are shown. If none work for you, choose “None of these times work”.",
+    unavailableChoice:"None of these times work",
+    unavailableHelp:"No booking will be created; we will only record this choice.",
+    submitChoice:"Confirm choice",
     back:"Back",
     needChoice:"Please choose an option first.",
     processing:"Processing…",
     bookedTitle:"Booking confirmed",
-    bookedWarning:"Your scan times are confirmed.",
-    waitlistTitle:"Added to the 4 October waitlist",
-    waitlistBody:"The 4 October slot was just taken by another participant. You have been added to its waitlist. The study team will contact you if it becomes available.",
-    oct10WaitlistTitle:"Added to the 10 October waitlist",
-    oct10WaitlistBody:"If a suitable place becomes available on 10 October, the study team will contact you to confirm the exact scan time. Please do not attend unless contacted.",
+    bookedWarning:"Your scan times for 1 November are confirmed.",
+    waitlistTitle:"The current 1 November openings have been taken",
+    waitlistBody:"You remain on the waitlist. If a suitable opening becomes available on 1 November, the study team will contact you. Please do not attend unless contacted.",
+    raceWaitlistTitle:"Added to the waitlist for that slot",
+    raceWaitlistBody:"The slot you selected was confirmed by another participant just before you. You remain on the waitlist for that slot and the study team will contact you if it becomes available.",
     unavailableTitle:"Preference recorded",
-    unavailableBody:"We recorded that the currently offered dates do not work for you. No booking or waitlist place has been created.",
+    unavailableBody:"We recorded that the currently offered 1 November times do not work for you. No booking has been created.",
     order:"Scan order",
     polyu:"PolyU UBSN",
     tmh:"Tuen Mun Hospital",
@@ -210,103 +210,96 @@ const state = {
   participant:null,
   noticesDone:0,
   choice:"",
-  october4Open:false,
-  compactFlow:false
+  openSlots:[]
 };
 
 const app = document.querySelector("#app");
 const tr = key => T[state.lang][key];
 
 function esc(value="") {
-  const el = document.createElement("span");
-  el.textContent = value == null ? "" : String(value);
+  const el=document.createElement("span");
+  el.textContent=value==null?"":String(value);
   return el.innerHTML;
 }
 
 function setProgress(n) {
-  document.querySelector("#progress").textContent = n ? `${tr("step")} ${n} / 5` : "";
+  document.querySelector("#progress").textContent=n?`${tr("step")} ${n} / 5`:"";
 }
 
 function translatePage() {
-  document.documentElement.lang = state.lang === "zh" ? "zh-Hant" : "en";
-  document.querySelectorAll("[data-text]").forEach(el => el.textContent = tr(el.dataset.text));
-  document.querySelector("#language").textContent = state.lang === "zh" ? "English" : "中文";
+  document.documentElement.lang=state.lang==="zh"?"zh-Hant":"en";
+  document.querySelectorAll("[data-text]").forEach(el=>el.textContent=tr(el.dataset.text));
+  document.querySelector("#language").textContent=state.lang==="zh"?"English":"中文";
 }
 
 function splitSlot(value) {
-  const text = String(value || "").trim();
-  const i = text.indexOf(" ");
-  return i < 0 ? {date:"",time:text} : {date:text.slice(0,i),time:text.slice(i+1)};
+  const text=String(value||"").trim();
+  const i=text.indexOf(" ");
+  return i<0?{date:"",time:text}:{date:text.slice(0,i),time:text.slice(i+1)};
 }
 
 function dateLabel(value) {
-  const d = splitSlot(value).date;
-  return d === "2026-10-04"
-    ? (state.lang === "zh" ? "2026 年 10 月 4 日" : "4 October 2026")
-    : d;
+  const d=splitSlot(value).date;
+  return d==="2026-11-01"
+    ?(state.lang==="zh"?"2026 年 11 月 1 日":"1 November 2026")
+    :d;
 }
 
 function arrivalTime(value) {
-  const m = splitSlot(value).time.match(/(\d{1,2}):(\d{2})/);
-  if (!m) return "";
-  const t = (Number(m[1])*60 + Number(m[2]) - 30 + 1440) % 1440;
-  return String(Math.floor(t/60)).padStart(2,"0") + ":" + String(t%60).padStart(2,"0");
+  const m=splitSlot(value).time.match(/(\d{1,2}):(\d{2})/);
+  if(!m) return "";
+  const t=(Number(m[1])*60+Number(m[2])-30+1440)%1440;
+  return String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0");
 }
 
 function orderLabel(order) {
-  if (state.lang === "zh") {
-    return order === "POLYU_FIRST" ? "香港理工大學 → 屯門醫院" : "屯門醫院 → 香港理工大學";
+  if(state.lang==="zh") {
+    return order==="POLYU_FIRST"?"香港理工大學 → 屯門醫院":"屯門醫院 → 香港理工大學";
   }
-  return order === "POLYU_FIRST" ? "PolyU → Tuen Mun Hospital" : "Tuen Mun Hospital → PolyU";
+  return order==="POLYU_FIRST"?"PolyU → Tuen Mun Hospital":"Tuen Mun Hospital → PolyU";
 }
 
 function genderLabel(gender) {
-  const value = String(gender || "").trim().toUpperCase();
-  if (value === "M") return tr("male");
-  if (value === "F") return tr("female");
+  const value=String(gender||"").trim().toUpperCase();
+  if(value==="M") return tr("male");
+  if(value==="F") return tr("female");
   return tr("other");
 }
 
-function preferenceKind(pref) {
-  const value = String(pref || "").trim().toUpperCase();
-  if (value.startsWith("OCT10")) return "OCT10";
-  if (value.startsWith("B:")) return "B";
-  if (value.startsWith("NONE")) return "NONE";
-  return "";
-}
-
 function participantSummary() {
-  const p = state.participant;
+  const p=state.participant;
   return `<div class="summary">
     <div><strong>${tr("name")}</strong><br>${esc(p.name)}</div>
     <div><strong>${tr("gender")}</strong><br>${esc(genderLabel(p.gender))}</div>
-    <div><strong>${tr("age")}</strong><br>${esc(p.age || "—")}</div>
-    <div><strong>${tr("phone")}</strong><br>${esc(p.phone || state.phone)}</div>
+    <div><strong>${tr("age")}</strong><br>${esc(p.age||"—")}</div>
+    <div><strong>${tr("phone")}</strong><br>${esc(p.phone||state.phone)}</div>
   </div>`;
 }
 
 async function api(payload) {
-  const response = await fetch(ASL_CONFIG.WEB_APP_URL,{
+  const response=await fetch(ASL_CONFIG.WEB_APP_URL,{
     method:"POST",
     headers:{"Content-Type":"text/plain;charset=utf-8"},
     body:JSON.stringify(payload)
   });
 
-  const result = await response.json();
-  if (!result.ok) {
-    throw Object.assign(new Error(result.message || "API error"),{code:result.code});
+  const result=await response.json();
+
+  if(!result.ok) {
+    throw Object.assign(new Error(result.message||"API error"),{code:result.code});
   }
+
   return result;
 }
 
 function renderPhone(error="") {
-  state.step = "phone";
+  state.step="phone";
   setProgress(1);
 
-  app.innerHTML = `
+  app.innerHTML=`
     <h2>${tr("phoneTitle")}</h2>
     <p class="muted">${tr("phoneHelp")}</p>
-    ${error ? `<p class="error">${esc(error)}</p>` : ""}
+    ${error?`<p class="error">${esc(error)}</p>`:""}
     <form id="phone-form">
       <label>${tr("phone")}</label>
       <div class="phone">
@@ -319,95 +312,81 @@ function renderPhone(error="") {
       <button type="submit">${tr("continue")}</button>
     </form>`;
 
-  document.querySelector("#phone-form").onsubmit = lookup;
+  document.querySelector("#phone-form").onsubmit=lookup;
 }
 
 async function lookup(event) {
   event.preventDefault();
 
-  const btn = event.currentTarget.querySelector("button");
-  btn.disabled = true;
-  btn.textContent = tr("finding");
+  const button=event.currentTarget.querySelector("button");
+  button.disabled=true;
+  button.textContent=tr("finding");
 
-  state.phone = document.querySelector("#country").value +
+  state.phone=document.querySelector("#country").value+
     document.querySelector("#phone").value.replace(/\s+/g,"");
 
   try {
-    const result = await api({action:"lookup",phone:state.phone});
-    state.participant = result.participant;
-    state.october4Open = result.october4Open === true;
-    state.choice = "";
+    const result=await api({action:"lookup",phone:state.phone});
+    state.participant=result.participant;
+    state.openSlots=Array.isArray(result.openSlots)?result.openSlots:[];
+    state.choice="";
 
-    if (state.participant.status === "COMPLETED") {
-      state.step = "completed";
+    if(state.participant.status==="COMPLETED") {
+      state.step="completed";
       setProgress(1);
-      app.innerHTML = `<h2>${esc(state.participant.name)}</h2><div class="important">${tr("completed")}</div>`;
+      app.innerHTML=`<h2>${esc(state.participant.name)}</h2><div class="important">${tr("completed")}</div>`;
       return;
     }
 
-    if (state.participant.appointment) {
+    if(state.participant.appointment) {
       renderBookedResult(state.participant.appointment);
       return;
     }
 
-    const pref = preferenceKind(state.participant.waitlistPreference);
-
-    if (pref === "OCT10") {
-      renderWaitlist("OCT10");
-      return;
-    }
-
-    if (pref === "B" && !state.october4Open) {
-      renderWaitlist("B");
-      return;
-    }
-
-    if (pref === "NONE") {
+    if(String(state.participant.waitlistPreference||"").startsWith("NONE: 2026-11-01")) {
       renderUnavailable();
       return;
     }
 
-    if (!state.october4Open) {
-      state.compactFlow = true;
-      renderChoicesOnly();
+    if(state.openSlots.length===0) {
+      renderWaitlist(null,false);
       return;
     }
 
-    state.compactFlow = false;
     renderProfile();
-  } catch (err) {
-    renderPhone(err.code === "NOT_FOUND" ? tr("notFound") : tr("error"));
+  } catch(err) {
+    renderPhone(err.code==="NOT_FOUND"?tr("notFound"):tr("error"));
   }
 }
 
 function renderProfile(message="") {
-  state.step = "profile";
+  state.step="profile";
   setProgress(2);
-  const p = state.participant;
+  const p=state.participant;
 
-  app.innerHTML = `
+  app.innerHTML=`
     <h2>${tr("participantInfo")}</h2>
     ${participantSummary()}
 
     <section class="panel">
       <h3>${tr("profileTitle")}</h3>
       <p class="muted">${tr("profileHelp")}</p>
-      ${message ? `<p class="error">${esc(message)}</p>` : ""}
+      ${message?`<p class="error">${esc(message)}</p>`:""}
 
       <form id="profile-form" class="profile-grid">
         <label>${tr("height")}
-          <input id="height" type="number" min="100" max="250" step="0.1" value="${esc(p.height || "")}" required>
+          <input id="height" type="number" min="100" max="250" step="0.1" value="${esc(p.height||"")}" required>
         </label>
 
         <label>${tr("weight")}
-          <input id="weight" type="number" min="20" max="300" step="0.1" value="${esc(p.weight || "")}" required>
+          <input id="weight" type="number" min="20" max="300" step="0.1" value="${esc(p.weight||"")}" required>
         </label>
 
         <label>${tr("handedness")}
           <select id="handedness" required>
             <option value=""></option>
-            <option value="R" ${p.handedness === "R" ? "selected" : ""}>${tr("right")}</option>
-            <option value="L" ${p.handedness === "L" ? "selected" : ""}>${tr("left")}</option>
+            <option value="R" ${p.handedness==="R"?"selected":""}>${tr("right")}</option>
+            <option value="L" ${p.handedness==="L"?"selected":""}>${tr("left")}</option>
           </select>
         </label>
 
@@ -415,18 +394,18 @@ function renderProfile(message="") {
       </form>
     </section>`;
 
-  document.querySelector("#profile-form").onsubmit = saveProfileAndContinue;
+  document.querySelector("#profile-form").onsubmit=saveProfileAndContinue;
 }
 
 async function saveProfileAndContinue(event) {
   event.preventDefault();
 
-  const button = document.querySelector("#profile-save");
-  button.disabled = true;
-  button.textContent = tr("saving");
+  const button=document.querySelector("#profile-save");
+  button.disabled=true;
+  button.textContent=tr("saving");
 
   try {
-    const result = await api({
+    const result=await api({
       action:"updateProfile",
       phone:state.phone,
       height:document.querySelector("#height").value,
@@ -434,198 +413,171 @@ async function saveProfileAndContinue(event) {
       handedness:document.querySelector("#handedness").value
     });
 
-    state.participant.height = result.height;
-    state.participant.weight = result.weight;
-    state.participant.handedness = result.handedness;
-    state.noticesDone = 0;
+    state.participant.height=result.height;
+    state.participant.weight=result.weight;
+    state.participant.handedness=result.handedness;
+    state.noticesDone=0;
     renderNotices();
-  } catch (err) {
-    renderProfile(err.message || tr("error"));
+  } catch(err) {
+    renderProfile(err.message||tr("error"));
   }
 }
 
 function renderNotices() {
-  state.step = "notices";
+  state.step="notices";
   setProgress(3);
 
-  app.innerHTML = `
+  app.innerHTML=`
     ${participantSummary()}
     <h2 style="margin-top:22px">${tr("notices")}</h2>
     <div id="notices"></div>`;
 
-  const list = document.querySelector("#notices");
+  const list=document.querySelector("#notices");
 
-  NOTICES[state.lang].forEach((text,index) => {
-    const done = index < state.noticesDone;
-    const unlocked = index <= state.noticesDone;
+  NOTICES[state.lang].forEach((text,index)=>{
+    const done=index<state.noticesDone;
+    const unlocked=index<=state.noticesDone;
 
     list.insertAdjacentHTML("beforeend",`
-      <div class="notice ${done ? "done" : unlocked ? "" : "locked"}">
+      <div class="notice ${done?"done":unlocked?"":"locked"}">
         <p>${text}</p>
-        <button type="button" data-notice="${index}" ${unlocked && !done ? "" : "disabled"}>
-          ${done ? tr("understood") : tr("understand")}
+        <button type="button" data-notice="${index}" ${unlocked&&!done?"":"disabled"}>
+          ${done?tr("understood"):tr("understand")}
         </button>
       </div>`);
   });
 
-  if (state.noticesDone === NOTICES[state.lang].length) {
+  if(state.noticesDone===NOTICES[state.lang].length) {
     list.insertAdjacentHTML("beforeend",`
       <div class="actions">
         <button id="to-choices" type="button">${tr("continue")}</button>
       </div>`);
   }
 
-  list.onclick = event => {
-    const button = event.target.closest("button[data-notice]");
-    if (!button || button.disabled) return;
-    state.noticesDone += 1;
+  list.onclick=event=>{
+    const button=event.target.closest("button[data-notice]");
+    if(!button||button.disabled) return;
+    state.noticesDone++;
     renderNotices();
   };
 
-  document.querySelector("#to-choices")?.addEventListener("click",() => renderChoices());
+  document.querySelector("#to-choices")?.addEventListener("click",()=>renderChoices());
 }
 
-function choiceButtons(includeOct4) {
+function choiceButtons() {
+  const slots=state.openSlots
+    .filter(id=>PLAN[id])
+    .map(id=>{
+      const p=PLAN[id];
+      return `
+        <button class="choice paired-choice ${state.choice===id?"selected":""}" type="button" data-choice="${id}">
+          <strong>${orderLabel(p.order)}</strong>
+          <span>理工 ${esc(splitSlot(p.polyuTime).time)}　→　屯門 ${esc(splitSlot(p.tmhTime).time)}</span>
+        </button>`;
+    })
+    .join("");
+
   return `
-    ${includeOct4 ? `
-      <button class="choice paired-choice ${state.choice === "B" ? "selected" : ""}" type="button" data-choice="B">
-        <strong>${tr("oct4Choice")}</strong>
-        <span>${tr("oct4Help")}</span>
-      </button>` : ""}
-
-    <button class="choice paired-choice ${state.choice === "OCT10" ? "selected" : ""}" type="button" data-choice="OCT10">
-      <strong>${tr("oct10Choice")}</strong>
-      <span>${tr("oct10Help")}</span>
-    </button>
-
-    <button class="choice paired-choice ${state.choice === "NONE" ? "selected" : ""}" type="button" data-choice="NONE">
+    ${slots}
+    <button class="choice paired-choice ${state.choice==="NONE"?"selected":""}" type="button" data-choice="NONE">
       <strong>${tr("unavailableChoice")}</strong>
       <span>${tr("unavailableHelp")}</span>
     </button>`;
 }
 
-function bindChoices(compact) {
-  app.querySelectorAll("[data-choice]").forEach(button => {
-    button.onclick = () => {
-      state.choice = button.dataset.choice;
-      compact ? renderChoicesOnly() : renderChoices();
-    };
-  });
-
-  document.querySelector("#submit-choice").onclick = submitChoice;
-}
-
 function renderChoices(message="") {
-  state.step = "choices";
+  state.step="choices";
   setProgress(4);
 
-  app.innerHTML = `
+  app.innerHTML=`
     <h2>${tr("choose")}</h2>
     <p class="muted">${tr("chooseHelp")}</p>
-    ${message ? `<p class="error">${esc(message)}</p>` : ""}
-    <div class="paired-choice-list">${choiceButtons(state.october4Open)}</div>
+    ${message?`<p class="error">${esc(message)}</p>`:""}
+    <div class="paired-choice-list">${choiceButtons()}</div>
     <div class="actions">
       <button class="secondary" id="back" type="button">${tr("back")}</button>
       <button id="submit-choice" type="button">${tr("submitChoice")}</button>
     </div>`;
 
-  document.querySelector("#back").onclick = () => renderNotices();
-  bindChoices(false);
-}
+  app.querySelectorAll("[data-choice]").forEach(button=>{
+    button.onclick=()=>{
+      state.choice=button.dataset.choice;
+      renderChoices();
+    };
+  });
 
-function renderChoicesOnly(message="") {
-  state.step = "choicesOnly";
-  setProgress(2);
-
-  app.innerHTML = `
-    <h2>${tr("choose")}</h2>
-    <p class="muted">${tr("chooseHelp")}</p>
-    ${message ? `<p class="error">${esc(message)}</p>` : ""}
-    <div class="paired-choice-list">${choiceButtons(false)}</div>
-    <div class="actions">
-      <button id="submit-choice" type="button">${tr("submitChoice")}</button>
-    </div>`;
-
-  bindChoices(true);
+  document.querySelector("#back").onclick=()=>renderNotices();
+  document.querySelector("#submit-choice").onclick=submitChoice;
 }
 
 async function submitChoice(event) {
-  if (!state.choice) {
-    state.compactFlow ? renderChoicesOnly(tr("needChoice")) : renderChoices(tr("needChoice"));
+  if(!state.choice) {
+    renderChoices(tr("needChoice"));
     return;
   }
 
-  event.currentTarget.disabled = true;
-  event.currentTarget.textContent = tr("processing");
+  event.currentTarget.disabled=true;
+  event.currentTarget.textContent=tr("processing");
 
   try {
-    if (state.choice === "OCT10" || state.choice === "NONE") {
-      const result = await api({
+    if(state.choice==="NONE") {
+      const result=await api({
         action:"recordPreference",
         phone:state.phone,
-        preference:state.choice
+        preference:"NONE"
       });
 
-      if (result.booked && result.appointment) {
-        state.participant.status = "BOOKED";
-        state.participant.appointment = result.appointment;
+      if(result.booked&&result.appointment) {
+        state.participant.status="BOOKED";
+        state.participant.appointment=result.appointment;
         renderBookedResult(result.appointment);
         return;
       }
 
-      state.participant.waitlistPreference = result.preference || "";
-
-      if (state.choice === "OCT10") {
-        state.participant.status = "WAITLIST";
-        renderWaitlist("OCT10");
-      } else {
-        state.participant.status = "";
-        renderUnavailable();
-      }
+      state.participant.status="";
+      state.participant.waitlistPreference=result.preference||"";
+      renderUnavailable();
       return;
     }
 
-    const result = await api({
+    const selected=state.choice;
+    const result=await api({
       action:"bookReplacement",
       phone:state.phone,
-      slotId:"B",
+      slotId:selected,
       acknowledged:true
     });
 
-    if (result.waitlisted) {
-      state.participant.status = "WAITLIST";
-      state.participant.waitlistPreference = result.preference;
-      renderWaitlist("B");
+    if(result.waitlisted) {
+      state.participant.status="WAITLIST";
+      state.participant.waitlistPreference=result.preference;
+      renderWaitlist(PLAN[selected],true);
       return;
     }
 
-    state.participant.status = "BOOKED";
-    state.participant.appointment = result.appointment;
+    state.participant.status="BOOKED";
+    state.participant.appointment=result.appointment;
     renderBookedResult(result.appointment);
-  } catch (err) {
-    state.compactFlow
-      ? renderChoicesOnly(err.message || tr("error"))
-      : renderChoices(err.message || tr("error"));
+  } catch(err) {
+    renderChoices(err.message||tr("error"));
   }
 }
 
-function renderWaitlist(kind) {
-  state.step = "waitlist";
-  setProgress(state.compactFlow ? 2 : 5);
+function renderWaitlist(plan,race) {
+  state.step="waitlist";
+  setProgress(5);
 
-  const oct10 = kind === "OCT10";
-
-  app.innerHTML = `
-    <h2>${oct10 ? tr("oct10WaitlistTitle") : tr("waitlistTitle")}</h2>
+  app.innerHTML=`
+    <h2>${race?tr("raceWaitlistTitle"):tr("waitlistTitle")}</h2>
     <div class="important">
-      <strong>${oct10 ? tr("oct10WaitlistBody") : tr("waitlistBody")}</strong>
+      <strong>${race?tr("raceWaitlistBody"):tr("waitlistBody")}</strong>
     </div>
 
-    ${!oct10 ? `
+    ${plan?`
       <div class="appointment">
-        <strong>${tr("oct4Choice")}</strong>
-        <p>${tr("oct4Help")}</p>
-      </div>` : ""}
+        <strong>${orderLabel(plan.order)}</strong>
+        <p>理工 ${esc(splitSlot(plan.polyuTime).time)} → 屯門 ${esc(splitSlot(plan.tmhTime).time)}</p>
+      </div>`:""}
 
     <div class="actions">
       <a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a>
@@ -633,10 +585,10 @@ function renderWaitlist(kind) {
 }
 
 function renderUnavailable() {
-  state.step = "unavailable";
-  setProgress(state.compactFlow ? 2 : 5);
+  state.step="unavailable";
+  setProgress(5);
 
-  app.innerHTML = `
+  app.innerHTML=`
     <h2>${tr("unavailableTitle")}</h2>
     <div class="important"><strong>${tr("unavailableBody")}</strong></div>
     <div class="actions">
@@ -645,23 +597,24 @@ function renderUnavailable() {
 }
 
 function resultCard(site,value,note,cls) {
-  return `<div class="appointment ${cls}">
-    <span>${site}：${tr("scanTime")}</span>
-    <strong>${dateLabel(value)}<br>${esc(splitSlot(value).time)}</strong>
-    <small><strong>${tr("arrival")}：${esc(arrivalTime(value))}</strong></small>
-    <p class="muted compact">${note}</p>
-  </div>`;
+  return `
+    <div class="appointment ${cls}">
+      <span>${site}：${tr("scanTime")}</span>
+      <strong>${dateLabel(value)}<br>${esc(splitSlot(value).time)}</strong>
+      <small><strong>${tr("arrival")}：${esc(arrivalTime(value))}</strong></small>
+      <p class="muted compact">${note}</p>
+    </div>`;
 }
 
 function renderBookedResult(a) {
-  state.step = "booked";
+  state.step="booked";
   setProgress(5);
 
-  const cards =
-    resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed") +
+  const cards=
+    resultCard(tr("polyu"),a.polyuTime,tr("polyuSignal"),"fixed")+
     resultCard(tr("tmh"),a.tmhTime,tr("tmhMeet"),"hospital");
 
-  app.innerHTML = `
+  app.innerHTML=`
     <h2 class="success">${tr("bookedTitle")}</h2>
     <div class="important"><strong>${tr("bookedWarning")}</strong></div>
 
@@ -697,7 +650,7 @@ function renderBookedResult(a) {
 
     <section class="preparation">
       <h3>${tr("preparation")}</h3>
-      <ul>${tr("prep").map(x => `<li>${x}</li>`).join("")}</ul>
+      <ul>${tr("prep").map(x=>`<li>${x}</li>`).join("")}</ul>
     </section>
 
     <section class="incentive">
@@ -705,58 +658,57 @@ function renderBookedResult(a) {
       <p><strong>${tr("incentiveText")}</strong></p>
     </section>
 
-    ${a.qr ? `
+    ${a.qr?`
       <div class="qr">
         <h3>${tr("qr")}</h3>
         <img src="${esc(a.qr)}" alt="Campus entry QR code">
         <a class="button-link" href="${esc(a.qr)}" target="_blank" rel="noopener">${tr("qrSave")}</a>
-      </div>` : ""}
+      </div>`:""}
 
     <section class="panel">
       <h3>${tr("docs")}</h3>
       <p>${tr("docsSend")}</p>
       <div class="actions">
-        <a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">${state.lang === "zh" ? "參加者須知" : "Information sheet"}</a>
-        <a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${state.lang === "zh" ? "同意書" : "Consent form"}</a>
+        <a class="button-link" href="${FILES.info}" target="_blank" rel="noopener">${state.lang==="zh"?"參加者須知":"Information sheet"}</a>
+        <a class="button-link" href="${FILES.consent}" target="_blank" rel="noopener">${state.lang==="zh"?"同意書":"Consent form"}</a>
         <a class="button-link" href="https://wa.me/85291230084" target="_blank" rel="noopener">WhatsApp 91230084</a>
       </div>
     </section>`;
 }
 
-document.addEventListener("keydown",event => {
-  if (event.key !== "Enter" || state.step !== "notices") return;
+document.addEventListener("keydown",event=>{
+  if(event.key!=="Enter"||state.step!=="notices") return;
 
-  const tag = (event.target && event.target.tagName || "").toUpperCase();
-  if (["A","INPUT","SELECT","TEXTAREA"].includes(tag)) return;
+  const tag=(event.target&&event.target.tagName||"").toUpperCase();
+  if(["A","INPUT","SELECT","TEXTAREA"].includes(tag)) return;
 
-  const next = document.querySelector('#notices button[data-notice]:not([disabled])');
-  const cont = document.querySelector("#to-choices");
+  const next=document.querySelector('#notices button[data-notice]:not([disabled])');
+  const cont=document.querySelector("#to-choices");
 
-  if (next) {
+  if(next) {
     event.preventDefault();
     next.click();
-  } else if (cont) {
+  } else if(cont) {
     event.preventDefault();
     cont.click();
   }
 });
 
-document.querySelector("#language").onclick = () => {
-  state.lang = state.lang === "zh" ? "en" : "zh";
+document.querySelector("#language").onclick=()=>{
+  state.lang=state.lang==="zh"?"en":"zh";
   translatePage();
 
-  const renderers = {
-    phone:() => renderPhone(),
-    profile:() => renderProfile(),
-    notices:() => renderNotices(),
-    choices:() => renderChoices(),
-    choicesOnly:() => renderChoicesOnly(),
-    waitlist:() => renderWaitlist(preferenceKind(state.participant.waitlistPreference) || "B"),
-    unavailable:() => renderUnavailable(),
-    booked:() => renderBookedResult(state.participant.appointment)
+  const renderers={
+    phone:()=>renderPhone(),
+    profile:()=>renderProfile(),
+    notices:()=>renderNotices(),
+    choices:()=>renderChoices(),
+    waitlist:()=>renderWaitlist(null,false),
+    unavailable:()=>renderUnavailable(),
+    booked:()=>renderBookedResult(state.participant.appointment)
   };
 
-  if (renderers[state.step]) {
+  if(renderers[state.step]) {
     renderers[state.step]();
   }
 };
