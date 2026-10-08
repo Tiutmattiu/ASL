@@ -731,3 +731,17 @@ document.querySelector("#language").onclick=()=>{
 
 translatePage();
 renderPhone();
+
+// Continue registration for participants arriving from the original portal.
+let bookingPhone="";
+try{
+  bookingPhone=sessionStorage.getItem("aslBookingPhone")||"";
+  sessionStorage.removeItem("aslBookingPhone");
+}catch{}
+if(/^\+852\d{8}$/.test(bookingPhone)||/^\+86\d{11}$/.test(bookingPhone)){
+  const country=bookingPhone.startsWith("+852")?"+852":"+86";
+  document.querySelector("#country").value=country;
+  document.querySelector("#phone").value=bookingPhone.slice(country.length);
+  lookup({preventDefault(){},currentTarget:document.querySelector("#phone-form")});
+}
+
