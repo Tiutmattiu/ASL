@@ -153,7 +153,16 @@ async function lookup(event){
   event.preventDefault();
   const btn=event.currentTarget.querySelector("button");btn.disabled=true;btn.textContent=tr("finding");
   state.phone=document.querySelector("#country").value+document.querySelector("#phone").value.replace(/\s+/g,"");
-  try{const r=await api({action:"lookup",phone:state.phone});state.participant=r.participant;renderPortal();}
+  try{
+    const r=await api({action:"lookup",phone:state.phone});
+    state.participant=r.participant;
+    if(!state.participant.appointment&&state.participant.status!=="COMPLETED"){
+      try{sessionStorage.setItem("aslBookingPhone",state.phone);}catch{}
+      location.assign("standby.html");
+      return;
+    }
+    renderPortal();
+  }
   catch(e){renderPhone(e.code==="NOT_FOUND"?tr("notFound"):tr("error"));}
 }
 
@@ -213,3 +222,4 @@ async function saveProfile(event){
 document.querySelector("#language").onclick=()=>{state.lang=state.lang==="zh"?"en":"zh";translatePage();state.participant?renderPortal():renderPhone();};
 translatePage();
 renderPhone();
+
