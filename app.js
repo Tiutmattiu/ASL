@@ -31,7 +31,7 @@ const T = {
     tmhMeet:"到達屯門醫院後，請到主座地下放射科（X光部門）門口等候，工作人員會前往接你。",
     preparation:"掃描前準備",
     prepItems:[
-      "掃描前至少 2 小時不要進食。",
+      "掃描前無須嚴格空腹，可以少量進食。",
       "掃描當天不要吸煙、飲酒、飲用咖啡、茶、能量飲品或其他含咖啡因產品。",
       "前一晚不要熬夜，保持充足睡眠。",
       "掃描前避免劇烈運動及強烈情緒激動。",
@@ -89,7 +89,7 @@ const T = {
     tmhMeet:"At Tuen Mun Hospital, wait outside the Radiology (X-ray) Department on the ground floor of the Main Block. A staff member will meet you there.",
     preparation:"Before your scans",
     prepItems:[
-      "Do not eat for at least 2 hours before scanning.",
+      "You do not need to fast strictly before scanning; light meals are allowed.",
       "On the scan day, do not smoke, drink alcohol, coffee, tea, energy drinks, or other caffeinated products.",
       "Do not stay up late the night before; get sufficient sleep.",
       "Avoid strenuous exercise and strong emotional excitement.",

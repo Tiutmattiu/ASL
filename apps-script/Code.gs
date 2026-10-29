@@ -587,7 +587,7 @@ function getReminderText(phone,language) {
         "建議到達：" + arrival30_(participant.polyuTime),
         "屯門醫院掃描：" + participant.tmhTime,
         "建議到達：" + arrival30_(participant.tmhTime),
-        "掃描當天請勿吸煙、飲酒、飲用咖啡、茶、能量飲品或其他含咖啡因產品；掃描前至少2小時不要進食。",
+        "掃描當天請勿吸煙、飲酒、飲用咖啡、茶、能量飲品或其他含咖啡因產品；掃描前無須嚴格空腹，可以少量進食。",
         "到達後請電話或WhatsApp 91230084聯絡研究團隊。"
       ].join("\n")
     : [
@@ -596,7 +596,7 @@ function getReminderText(phone,language) {
         "Recommended arrival: " + arrival30_(participant.polyuTime),
         "Tuen Mun Hospital: " + participant.tmhTime,
         "Recommended arrival: " + arrival30_(participant.tmhTime),
-        "On the scan day, do not smoke, drink alcohol, coffee, tea, energy drinks or other caffeinated products. Do not eat for at least 2 hours before scanning.",
+        "On the scan day, do not smoke, drink alcohol, coffee, tea, energy drinks or other caffeinated products. You do not need to fast strictly before scanning; light meals are allowed.",
         "When you arrive, call or WhatsApp 91230084."
       ].join("\n");
 }
